@@ -1,8 +1,8 @@
 package exersicehandler
 
 import (
-	"BESocialHealth/Internal/exersicemanager/interactors"
-	exersicerepositories "BESocialHealth/Internal/exersicemanager/repositories"
+	"BESocialHealth/Internal/exersice_management/interactors"
+	exersicerepositories "BESocialHealth/Internal/exersice_management/repositories"
 	"BESocialHealth/component/appctx"
 	"github.com/gin-gonic/gin"
 	"net/http"

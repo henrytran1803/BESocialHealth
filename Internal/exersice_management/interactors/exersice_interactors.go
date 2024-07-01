@@ -1,8 +1,8 @@
 package interactors
 
 import (
-	exersicemodels "BESocialHealth/Internal/exersicemanager/models"
-	exersicerepositories "BESocialHealth/Internal/exersicemanager/repositories"
+	exersicemodels "BESocialHealth/Internal/exersice_management/models"
+	exersicerepositories "BESocialHealth/Internal/exersice_management/repositories"
 	"fmt"
 )
 

@@ -2,17 +2,16 @@ package main
 
 import (
 	accounthandlers "BESocialHealth/Internal/account/handlers"
-	exersicehandler "BESocialHealth/Internal/exersicemanager/handler"
+	exersicehandler "BESocialHealth/Internal/exersice_management/handler"
 	foodhandler "BESocialHealth/Internal/food_management/handler"
+	personalcontenthandler "BESocialHealth/Internal/personal_content_management/handler"
+	mealhandler "BESocialHealth/Internal/personal_meal_management/handler"
 	userhandler "BESocialHealth/Internal/user_management/handler"
 	"BESocialHealth/component/appctx"
 	"BESocialHealth/middleware"
-	"context"
-	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"google.golang.org/api/option"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -68,19 +67,55 @@ func main() {
 	user.PUT("/:id", userhandler.UpdateUserHandler(appctx))
 	user.DELETE("/:id", userhandler.DeleteUserHandler(appctx))
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	ctx := context.Background()
-	sa := option.WithCredentialsFile("./cmd/beorderfood-de62b3f3f8d0.json")
-	app, err := firebase.NewApp(ctx, nil, sa)
-	if err != nil {
-		log.Fatalf("error initializing app: %v\n", err)
-	}
+	//meal
 
-	client, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalf("error getting Firestore client: %v\n", err)
-	}
-	defer client.Close()
+	meal := v1.Group("/meal")
+	meal.POST("", mealhandler.CreateMealHandler(appctx))
+	meal.GET("/user/:id", mealhandler.GetMealsByUserIdHandler(appctx))
+	meal.GET("/:id", mealhandler.GetMealByIdHandler(appctx))
+	meal.POST("/detail", mealhandler.CreateMealDetailHandler(appctx))
+	meal.PUT("/detail", mealhandler.UpdateMealDetail(appctx))
+	meal.DELETE("/:id", mealhandler.DeleteMealById(appctx))
+	meal.DELETE("/detail/:id", mealhandler.DeleteDetailMealById(appctx))
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	//content
+	content := v1.Group("/content")
+	content.POST("", personalcontenthandler.CreatePostHandler(appctx))
+	content.POST("/like", personalcontenthandler.LikeHandler(appctx))
+	content.DELETE("/like", personalcontenthandler.DeleteLikeByUserIdAndPostIdHandler(appctx))
+	content.DELETE("/:id", personalcontenthandler.DeletePostHandler(appctx))
+	content.POST("/coment", personalcontenthandler.CreatePostHandler(appctx))
+	content.PUT("/:id", personalcontenthandler.UpdatePostHandler(appctx))
+	content.GET("/:id", personalcontenthandler.GetPostByIdHandler(appctx))
+	content.GET("", personalcontenthandler.GetAllPostHandler(appctx))
+	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
+	// lay toan bo post, lay post theo id lay theo userid
+
+	// xoa coment ca nhatcoment
+	// WebSocket routes
+	r.GET("/ws/admin", func(c *gin.Context) {
+		handleAdminConnections(c.Writer, c.Request)
+	})
+
+	r.GET("/ws/user", func(c *gin.Context) {
+		handleUserConnections(c.Writer, c.Request)
+	})
+
+	go handleAdminMessages()
+	go handleUserMessages()
+	//ctx := context.Background()
+	//sa := option.WithCredentialsFile("./cmd/beorderfood-de62b3f3f8d0.json")
+	//app, err := firebase.NewApp(ctx, nil, sa)
+	//if err != nil {
+	//	log.Fatalf("error initializing app: %v\n", err)
+	//}
+	//
+	//client, err := app.Firestore(ctx)
+	//if err != nil {
+	//	log.Fatalf("error getting Firestore client: %v\n", err)
+	//}
+	//defer client.Close()
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}

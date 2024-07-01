@@ -1,7 +1,7 @@
 package exersicerepositories
 
 import (
-	exersicemodels "BESocialHealth/Internal/exersicemanager/models"
+	exersicemodels "BESocialHealth/Internal/exersice_management/models"
 	foodmodels "BESocialHealth/Internal/food_management/models"
 )
 
