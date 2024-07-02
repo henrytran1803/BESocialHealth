@@ -6,12 +6,11 @@ import (
 	foodhandler "BESocialHealth/Internal/food_management/handler"
 	personalcontenthandler "BESocialHealth/Internal/personal_content_management/handler"
 	mealhandler "BESocialHealth/Internal/personal_meal_management/handler"
+	schedulehandler "BESocialHealth/Internal/personal_schedule_management/handler"
 	userhandler "BESocialHealth/Internal/user_management/handler"
 	"BESocialHealth/component/appctx"
 	"BESocialHealth/middleware"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -68,7 +67,6 @@ func main() {
 	user.DELETE("/:id", userhandler.DeleteUserHandler(appctx))
 
 	//meal
-
 	meal := v1.Group("/meal")
 	meal.POST("", mealhandler.CreateMealHandler(appctx))
 	meal.GET("/user/:id", mealhandler.GetMealsByUserIdHandler(appctx))
@@ -78,7 +76,6 @@ func main() {
 	meal.DELETE("/:id", mealhandler.DeleteMealById(appctx))
 	meal.DELETE("/detail/:id", mealhandler.DeleteDetailMealById(appctx))
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//content
 	content := v1.Group("/content")
 	content.POST("", personalcontenthandler.CreatePostHandler(appctx))
@@ -90,7 +87,22 @@ func main() {
 	content.GET("/:id", personalcontenthandler.GetPostByIdHandler(appctx))
 	content.GET("", personalcontenthandler.GetAllPostHandler(appctx))
 	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
-	// lay toan bo post, lay post theo id lay theo userid
+	// schedule
+	schedule := v1.Group("/schedule")
+	schedule.POST("", schedulehandler.CreateScheduleHandler(appctx))
+	schedule.POST("/detail", schedulehandler.CreateScheduleDetailHandler(appctx))
+	schedule.GET("", schedulehandler.GetAllScheduleHandler(appctx))
+	schedule.GET("/:id", schedulehandler.GetScheduleByIdHandler(appctx))
+	schedule.PUT("", schedulehandler.UpdateScheduleHandler(appctx))
+	schedule.PUT("/detail", schedulehandler.UpdateScheduleDetailHandler(appctx))
+	schedule.DELETE("/:id", schedulehandler.DeleteScheduleHandler(appctx))
+	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
+	//lay toan bo danh sach theo id nguoi dung
+	// them schedule moi
+	// them detail moi
+	// update 2 cai
+	// lay chi tiet theo id
+	// xoa tung cai xoa het
 
 	// xoa coment ca nhatcoment
 	// WebSocket routes
