@@ -4,6 +4,7 @@ import (
 	accounthandlers "BESocialHealth/Internal/account/handlers"
 	exersicehandler "BESocialHealth/Internal/exersice_management/handler"
 	foodhandler "BESocialHealth/Internal/food_management/handler"
+	messagehandler "BESocialHealth/Internal/messaging/handler"
 	personalcontenthandler "BESocialHealth/Internal/personal_content_management/handler"
 	mealhandler "BESocialHealth/Internal/personal_meal_management/handler"
 	schedulehandler "BESocialHealth/Internal/personal_schedule_management/handler"
@@ -97,37 +98,28 @@ func main() {
 	schedule.PUT("/detail", schedulehandler.UpdateScheduleDetailHandler(appctx))
 	schedule.DELETE("/:id", schedulehandler.DeleteScheduleHandler(appctx))
 	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
-	//lay toan bo danh sach theo id nguoi dung
-	// them schedule moi
-	// them detail moi
-	// update 2 cai
-	// lay chi tiet theo id
-	// xoa tung cai xoa het
+	// message
+	message := v1.Group("/conversation")
+	message.POST("", messagehandler.CreateConversationHandler(appctx))
+	message.POST("/messages", messagehandler.SendMessageHandler(appctx))
+	message.GET("/users/:user_id/conversations", messagehandler.ListUserConversationsHandler(appctx))
+	message.GET("/:conversation_id/messages", messagehandler.ListConversationMessagesHandler(appctx))
+	//làm thêm delete nữa
+	// reminder
 
 	// xoa coment ca nhatcoment
 	// WebSocket routes
-	r.GET("/ws/admin", func(c *gin.Context) {
-		handleAdminConnections(c.Writer, c.Request)
-	})
-
-	r.GET("/ws/user", func(c *gin.Context) {
-		handleUserConnections(c.Writer, c.Request)
-	})
-
-	go handleAdminMessages()
-	go handleUserMessages()
-	//ctx := context.Background()
-	//sa := option.WithCredentialsFile("./cmd/beorderfood-de62b3f3f8d0.json")
-	//app, err := firebase.NewApp(ctx, nil, sa)
-	//if err != nil {
-	//	log.Fatalf("error initializing app: %v\n", err)
-	//}
+	//r.GET("/ws/admin", func(c *gin.Context) {
+	//	ws.handleAdminConnections(c.Writer, c.Request)
+	//})
 	//
-	//client, err := app.Firestore(ctx)
-	//if err != nil {
-	//	log.Fatalf("error getting Firestore client: %v\n", err)
-	//}
-	//defer client.Close()
+	//r.GET("/ws/user", func(c *gin.Context) {
+	//	ws.handleUserConnections(c.Writer, c.Request)
+	//})
+	//
+	//go ws.handleAdminMessages()
+	//go ws.handleUserMessages()
+
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}

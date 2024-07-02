@@ -1,4 +1,4 @@
-package main
+package ws
 
 import (
 	"github.com/gorilla/websocket"
@@ -6,8 +6,19 @@ import (
 	"net/http"
 )
 
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 var userClients = make(map[*websocket.Conn]bool)
 var userBroadcast = make(chan Message)
+
+type Message struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Content string `json:"content"`
+}
 
 func handleUserConnections(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
@@ -43,3 +54,16 @@ func handleUserMessages() {
 		}
 	}
 }
+
+//func SendMessageToClient(userID int, message messagemodels.Message) error {
+//	// Lấy danh sách kết nối websocket của người dùng từ userClients (nếu sử dụng cấu trúc map trong phần trước)
+//	if conns, ok := userClients[userID]; ok {
+//		for _, conn := range conns {
+//			err := conn.WriteJSON(message)
+//			if err != nil {
+//				return err
+//			}
+//		}
+//	}
+//	return nil
+//}
