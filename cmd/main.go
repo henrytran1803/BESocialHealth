@@ -8,8 +8,10 @@ import (
 	personalcontenthandler "BESocialHealth/Internal/personal_content_management/handler"
 	mealhandler "BESocialHealth/Internal/personal_meal_management/handler"
 	schedulehandler "BESocialHealth/Internal/personal_schedule_management/handler"
+	reminderhandler "BESocialHealth/Internal/reminder_management/handler"
 	userhandler "BESocialHealth/Internal/user_management/handler"
 	"BESocialHealth/component/appctx"
+	"BESocialHealth/component/ws"
 	"BESocialHealth/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -106,9 +108,16 @@ func main() {
 	message.GET("/:conversation_id/messages", messagehandler.ListConversationMessagesHandler(appctx))
 	//làm thêm delete nữa
 	// reminder
-
-	// xoa coment ca nhatcoment
-	// WebSocket routes
+	reminder := v1.Group("/reminder")
+	reminder.POST("", reminderhandler.CreateReminderHandler(appctx))
+	reminder.PUT("", reminderhandler.UpdateReminderHandler(appctx))
+	reminder.GET("/:id", reminderhandler.GetReminderByIdHandler(appctx))
+	reminder.DELETE("/:id", reminderhandler.DeleteReminderByIdHandler(appctx))
+	reminder.GET("/user/:id", reminderhandler.GetReminderByIdHandler(appctx))
+	manager := ws.NewWebSocketManager()
+	r.GET("/ws", func(c *gin.Context) {
+		manager.WebSocketHandler(c.Writer, c.Request)
+	})
 	//r.GET("/ws/admin", func(c *gin.Context) {
 	//	ws.handleAdminConnections(c.Writer, c.Request)
 	//})

@@ -44,6 +44,7 @@ type Account struct {
 type Login struct {
 	Email    string `gorm:"type:varchar(255);not null;column:email" json:"email"`
 	Password string `gorm:"type:varchar(255);column:password" json:"password"`
+	//JWTSecret string
 }
 
 type PasswordResetToken struct {

@@ -40,6 +40,7 @@ func (i *AccountInteractor) Login(login *accountmodels.Login) (*accountmodels.Us
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }
 func (i *AccountInteractor) RequestPasswordReset(email string) error {
