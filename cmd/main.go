@@ -18,6 +18,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -35,8 +36,7 @@ func main() {
 	//db.AutoMigrate(&usermodel.User{})
 	r := gin.Default()
 	appctx := appctx.NewAppContext(db)
-	r.Use(middleware.Recover(appctx))
-	log.Println("Role found:")
+
 	v1 := r.Group("/v1")
 	// account
 	account := v1.Group("/account")
@@ -47,6 +47,8 @@ func main() {
 
 	// food
 	food := v1.Group("/food")
+	food.Use(middleware.AuthMiddleware(appctx))
+
 	food.POST("", foodhandler.CreateFoodHandler(appctx))
 	food.PUT("/:id", foodhandler.UpdateFoodHandler(appctx))
 	food.DELETE("/:id", foodhandler.DeleteFoodHandler(appctx))
@@ -55,6 +57,8 @@ func main() {
 
 	//exersice
 	exersice := v1.Group("/exersice")
+	exersice.Use(middleware.AuthMiddleware(appctx))
+
 	exersice.POST("", exersicehandler.CreateExersiceHandler(appctx))
 	exersice.PUT("/:id", exersicehandler.UpdateExersiceHandeler(appctx))
 	exersice.DELETE("/:id", exersicehandler.DeleteExersiceHandler(appctx))
@@ -63,6 +67,8 @@ func main() {
 
 	//user
 	user := v1.Group("/user")
+	user.Use(middleware.AuthMiddleware(appctx))
+
 	user.GET("", userhandler.GetAllUserHandler(appctx))
 	user.GET("/:id", userhandler.GetUserByIdHandler(appctx))
 	user.POST("", userhandler.CreateUserHandler(appctx))
@@ -71,6 +77,8 @@ func main() {
 
 	//meal
 	meal := v1.Group("/meal")
+	meal.Use(middleware.AuthMiddleware(appctx))
+
 	meal.POST("", mealhandler.CreateMealHandler(appctx))
 	meal.GET("/user/:id", mealhandler.GetMealsByUserIdHandler(appctx))
 	meal.GET("/:id", mealhandler.GetMealByIdHandler(appctx))
@@ -81,6 +89,8 @@ func main() {
 
 	//content
 	content := v1.Group("/content")
+	content.Use(middleware.AuthMiddleware(appctx))
+
 	content.POST("", personalcontenthandler.CreatePostHandler(appctx))
 	content.POST("/like", personalcontenthandler.LikeHandler(appctx))
 	content.DELETE("/like", personalcontenthandler.DeleteLikeByUserIdAndPostIdHandler(appctx))
@@ -92,6 +102,8 @@ func main() {
 	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
 	// schedule
 	schedule := v1.Group("/schedule")
+	schedule.Use(middleware.AuthMiddleware(appctx))
+
 	schedule.POST("", schedulehandler.CreateScheduleHandler(appctx))
 	schedule.POST("/detail", schedulehandler.CreateScheduleDetailHandler(appctx))
 	schedule.GET("", schedulehandler.GetAllScheduleHandler(appctx))
@@ -100,35 +112,33 @@ func main() {
 	schedule.PUT("/detail", schedulehandler.UpdateScheduleDetailHandler(appctx))
 	schedule.DELETE("/:id", schedulehandler.DeleteScheduleHandler(appctx))
 	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
+
 	// message
 	message := v1.Group("/conversation")
+	message.Use(middleware.AuthMiddleware(appctx))
 	message.POST("", messagehandler.CreateConversationHandler(appctx))
 	message.POST("/messages", messagehandler.SendMessageHandler(appctx))
 	message.GET("/users/:user_id/conversations", messagehandler.ListUserConversationsHandler(appctx))
 	message.GET("/:conversation_id/messages", messagehandler.ListConversationMessagesHandler(appctx))
 	//làm thêm delete nữa
 	// reminder
+
 	reminder := v1.Group("/reminder")
+	reminder.Use(middleware.AuthMiddleware(appctx))
 	reminder.POST("", reminderhandler.CreateReminderHandler(appctx))
 	reminder.PUT("", reminderhandler.UpdateReminderHandler(appctx))
 	reminder.GET("/:id", reminderhandler.GetReminderByIdHandler(appctx))
 	reminder.DELETE("/:id", reminderhandler.DeleteReminderByIdHandler(appctx))
 	reminder.GET("/user/:id", reminderhandler.GetReminderByIdHandler(appctx))
+
+	//ws
 	manager := ws.NewWebSocketManager()
 	r.GET("/ws", func(c *gin.Context) {
 		manager.WebSocketHandler(c.Writer, c.Request)
 	})
-	//r.GET("/ws/admin", func(c *gin.Context) {
-	//	ws.handleAdminConnections(c.Writer, c.Request)
-	//})
-	//
-	//r.GET("/ws/user", func(c *gin.Context) {
-	//	ws.handleUserConnections(c.Writer, c.Request)
-	//})
-	//
-	//go ws.handleAdminMessages()
-	//go ws.handleUserMessages()
-
+	// Reminder Checker
+	reminderChecker := ws.NewReminderChecker(appctx, manager, 1*time.Minute) // Kiểm tra mỗi phút một lần
+	reminderChecker.Start()
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}

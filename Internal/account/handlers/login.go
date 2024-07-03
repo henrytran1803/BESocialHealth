@@ -4,6 +4,7 @@ import (
 	accountinteractors "BESocialHealth/Internal/account/interactors"
 	accountmodels "BESocialHealth/Internal/account/models"
 	accountrepositories "BESocialHealth/Internal/account/repositories"
+	accountuntils "BESocialHealth/Internal/account/untils"
 	"BESocialHealth/comon"
 	"BESocialHealth/component/appctx"
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,9 @@ func LoginHandler(appctx appctx.AppContext) gin.HandlerFunc {
 					Message: err.Error(),
 				},
 			)
+			return
 		}
+
 		user, err := accountInteractor.Login(&login)
 		if err != nil {
 			c.JSON(http.StatusBadRequest,
@@ -32,11 +35,35 @@ func LoginHandler(appctx appctx.AppContext) gin.HandlerFunc {
 					Status:  "fail",
 					Message: err.Error(),
 				})
+			return
 		}
+
+		// Generate a new secret for the user and update the database
+		user.JWTSecret = accountuntils.GenerateRandomString(32)
+		if err := db.Save(user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError,
+				comon.Response{
+					Status:  "fail",
+					Message: "Failed to update user secret",
+				})
+			return
+		}
+
+		// Generate JWT token
+		token, err := accountuntils.GenerateJWT(user.Id, user.JWTSecret)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError,
+				comon.Response{
+					Status:  "fail",
+					Message: "Failed to generate token",
+				})
+			return
+		}
+
 		c.JSON(http.StatusOK, comon.Response{
 			Status:  "ok",
 			Message: "success",
-			Data:    user,
+			Data:    gin.H{"token": token},
 		})
 	}
 }

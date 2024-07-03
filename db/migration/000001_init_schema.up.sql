@@ -265,6 +265,7 @@ CREATE TABLE messages (
                           FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id),
                           FOREIGN KEY (sender_id) REFERENCES users(id)
 );
+ALTER TABLE users ADD COLUMN jwt_secret VARCHAR(255);
 
 
 --   ALTER TABLE `photos` ADD FOREIGN KEY (`photo_type`) REFERENCES `photo_type` (`id`);
