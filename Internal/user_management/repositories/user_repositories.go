@@ -2,7 +2,6 @@ package userrepositories
 
 import (
 	usermodels "BESocialHealth/Internal/user_management/models"
-	"time"
 )
 
 func (r *UserRepository) GetUserById(id int) (*usermodels.User, error) {
@@ -22,13 +21,14 @@ func (r *UserRepository) GetAllUser() (*[]usermodels.User, error) {
 }
 
 func (r *UserRepository) UpdateUser(user *usermodels.UserDetail) error {
-	if err := r.DB.Table(usermodels.User{}.TableName()).Save(&user).Error; err != nil {
+	if err := r.DB.Table(usermodels.User{}.TableName()).Save(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
+
 func (r *UserRepository) DeleteUserById(id int) error {
-	if err := r.DB.Table(usermodels.User{}.TableName()).Where("id = ?", id).Update("deleted_at", time.Now()).Error; err != nil {
+	if err := r.DB.Table(usermodels.User{}.TableName()).Where("id = ?", id).Update("status", 1).Error; err != nil {
 		return err
 	}
 	return nil

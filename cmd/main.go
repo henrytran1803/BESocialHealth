@@ -48,17 +48,19 @@ func main() {
 	// food
 	food := v1.Group("/food")
 	food.Use(middleware.AuthMiddleware(appctx))
-
 	food.POST("", foodhandler.CreateFoodHandler(appctx))
 	food.PUT("/:id", foodhandler.UpdateFoodHandler(appctx))
+	food.PUT("", foodhandler.UpdateFoodNonePhoto(appctx))
+
 	food.DELETE("/:id", foodhandler.DeleteFoodHandler(appctx))
 	food.GET("", foodhandler.GetListFoodHandler(appctx))
 	food.GET("/:id", foodhandler.GetFoodHandler(appctx))
-
+	food.DELETE("photo/:id", foodhandler.DeletePhotoHandler(appctx))
+	food.POST("photo", foodhandler.CreatePhotoHandler(appctx))
+	food.POST("photos", foodhandler.CreatePhotoListHandler(appctx))
 	//exersice
 	exersice := v1.Group("/exersice")
 	exersice.Use(middleware.AuthMiddleware(appctx))
-
 	exersice.POST("", exersicehandler.CreateExersiceHandler(appctx))
 	exersice.PUT("/:id", exersicehandler.UpdateExersiceHandeler(appctx))
 	exersice.DELETE("/:id", exersicehandler.DeleteExersiceHandler(appctx))
@@ -74,7 +76,7 @@ func main() {
 	user.POST("", userhandler.CreateUserHandler(appctx))
 	user.PUT("/:id", userhandler.UpdateUserHandler(appctx))
 	user.DELETE("/:id", userhandler.DeleteUserHandler(appctx))
-
+	user.PUT("/password", accounthandlers.ChangePasswordHandler(appctx))
 	//meal
 	meal := v1.Group("/meal")
 	meal.Use(middleware.AuthMiddleware(appctx))
@@ -86,7 +88,6 @@ func main() {
 	meal.PUT("/detail", mealhandler.UpdateMealDetail(appctx))
 	meal.DELETE("/:id", mealhandler.DeleteMealById(appctx))
 	meal.DELETE("/detail/:id", mealhandler.DeleteDetailMealById(appctx))
-
 	//content
 	content := v1.Group("/content")
 	content.Use(middleware.AuthMiddleware(appctx))

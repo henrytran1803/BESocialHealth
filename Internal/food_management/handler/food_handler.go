@@ -20,7 +20,7 @@ func CreateFoodHandler(appctx appctx.AppContext) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		file, err := c.FormFile("image")
+		file, err := c.FormFile("photos")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Image file is required"})
 			return
@@ -114,6 +114,23 @@ func UpdateFoodHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		)
 	}
 }
+func UpdateFoodNonePhoto(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var food foodmodels.FoodUpdate
+		if err := c.ShouldBind(&food); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		db := appctx.GetMainDBConnection()
+		foodRepo := foodrepositories.NewFoodRepository(db)
+		foodInteractor := foodinteractors.NewFoodInteractor(foodRepo)
+		err := foodInteractor.UpdateFoodNonePhoto(&food)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Food item updated successfully"})
+	}
+
+}
 
 func DeleteFoodHandler(appctx appctx.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -159,5 +176,52 @@ func GetFoodHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 		}
 		c.JSON(http.StatusOK, gin.H{"data": foods})
+	}
+}
+func DeletePhotoHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idParam := c.Param("id")
+		foodID, err := strconv.Atoi(idParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid food ID"})
+		}
+		db := appctx.GetMainDBConnection()
+		foodRepo := foodrepositories.NewFoodRepository(db)
+		foodInteractor := foodinteractors.NewFoodInteractor(foodRepo)
+		if err := foodInteractor.DeletePhotoById(foodID); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Food item deleted successfully"})
+	}
+}
+func CreatePhotoHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var photo foodmodels.PhotoBase
+		if err := c.ShouldBindJSON(&photo); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		db := appctx.GetMainDBConnection()
+		foodRepo := foodrepositories.NewFoodRepository(db)
+		foodInteractor := foodinteractors.NewFoodInteractor(foodRepo)
+		if err := foodInteractor.CreatePhoto(&photo); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Food item created successfully"})
+	}
+}
+func CreatePhotoListHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var photo []foodmodels.PhotoBase
+		if err := c.ShouldBindJSON(&photo); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		db := appctx.GetMainDBConnection()
+		foodRepo := foodrepositories.NewFoodRepository(db)
+		foodInteractor := foodinteractors.NewFoodInteractor(foodRepo)
+		if err := foodInteractor.CreateListPhoto(photo); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Food item created successfully"})
 	}
 }

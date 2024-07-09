@@ -32,14 +32,19 @@ func (i *UserInteractor) GetAllUsers() (*[]usermodels.User, error) {
 	return users, nil
 }
 func (i *UserInteractor) UpdateUser(user *usermodels.UserDetail) error {
-	if user.Email == "" || user.FirstName == "" || user.LastName == "" {
-		return errors.New("invalid input")
+	if user == nil {
+		return errors.New("user is nil")
 	}
+	if user.Email == "" || user.FirstName == "" || user.LastName == "" {
+		return errors.New("required fields are empty")
+	}
+	// Các xử lý cập nhật user khác
 	if err := i.UserRepository.UpdateUser(user); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (i *UserInteractor) DeleteUserById(id int) error {
 	if err := i.UserRepository.DeleteUserById(id); err != nil {
 		return err

@@ -14,10 +14,10 @@ func (r *ScheduleRepository) GetListSchedule() ([]schedulemodels.ScheduleGet, er
 			return nil, err
 		}
 		result := schedulemodels.ScheduleGet{
-			User_id:  schedule.User_id,
-			Time:     schedule.Time,
-			SQLModel: schedule.SQLModel,
-			Detail:   details,
+			User_id: schedule.User_id,
+			Time:    schedule.Time,
+			Id:      schedule.Id,
+			Detail:  details,
 		}
 		results = append(results, result)
 	}
@@ -34,10 +34,10 @@ func (r *ScheduleRepository) GetSchedule(scheduleID string) (*schedulemodels.Sch
 		return nil, err
 	}
 	result := schedulemodels.ScheduleGet{
-		User_id:  schedule.User_id,
-		Time:     schedule.Time,
-		SQLModel: schedule.SQLModel,
-		Detail:   details,
+		User_id: schedule.User_id,
+		Time:    schedule.Time,
+		Id:      schedule.Id,
+		Detail:  details,
 	}
 	return &result, nil
 }

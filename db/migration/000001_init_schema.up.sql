@@ -12,17 +12,12 @@ CREATE TABLE `users` (
                          `status` int,
                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                          PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `roles` (
                          `id` int NOT NULL AUTO_INCREMENT,
                          `name` varchar(255),
-                         `status` int,
-                         `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                         `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                          PRIMARY KEY (`id`)
 );
 ALTER TABLE `users` ADD FOREIGN KEY (`role`) REFERENCES `roles` (`id`);
@@ -32,9 +27,6 @@ CREATE TABLE `accounts` (
                             `user_id` int NOT NULL,
                             `password` varchar(255),
                             `status` int,
-                            `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                            `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                             PRIMARY KEY (`id`),
                             UNIQUE KEY `unique_user_id` (`user_id`),
                             FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
@@ -44,9 +36,6 @@ CREATE TABLE `exersice_type` (
                                  `id` int NOT NULL AUTO_INCREMENT,
                                  `name` varchar(255),
                                  `status` int,
-                                 `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                                 `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                 `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                                  PRIMARY KEY (`id`)
 );
 
@@ -59,9 +48,6 @@ CREATE TABLE `exersices` (
                              `rep_serving` int,
                              `time_serving` int,
                              `status` int,
-                             `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                             `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                             `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                              PRIMARY KEY (`id`),
                              FOREIGN KEY (`exersice_type`) REFERENCES `exersice_type`(`id`)
 );
@@ -74,7 +60,6 @@ CREATE TABLE `schedules` (
                              `status` int,
                              `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                              `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                             `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                              PRIMARY KEY (`id`),
                              FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 );
@@ -85,10 +70,7 @@ CREATE TABLE `schedule_detail` (
                                    `exersice_id` int NOT NULL,
                                    `rep` int,
                                    `time` int,
-                                   `status` int,
-                                   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                                   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                   `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                                    PRIMARY KEY (`id`),
                                    UNIQUE KEY `unique_schedule` (`schedule_id`, `exersice_id`),
                                    FOREIGN KEY (`schedule_id`) REFERENCES `schedules`(`id`),
@@ -106,10 +88,7 @@ CREATE TABLE `dishes` (
                           `carb` double,
                           `sugar` double,
                           `serving` double,
-                          `status` int,
-                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                           PRIMARY KEY (`id`)
 );
 CREATE TABLE `meals` (
@@ -118,10 +97,6 @@ CREATE TABLE `meals` (
                          `description` text,
                          `date` timestamp,
                          `total_calorie` double,
-                         `status` int,
-                         `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                         `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                          PRIMARY KEY (`id`),
                          FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 );
@@ -133,10 +108,6 @@ CREATE TABLE `meal_detail` (
                                `meal_id` int,
                                `serving` double,
                                `calorie` double,
-                               `status` int,
-                               `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                               `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                               `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                                PRIMARY KEY (`id`),
                                UNIQUE KEY `unique_meal` (`dish_id`, `meal_id`),
                                FOREIGN KEY (`dish_id`) REFERENCES `dishes`(`id`),
@@ -152,9 +123,7 @@ CREATE TABLE `reminders` (
                              `reminder_type` int,
                              `date` timestamp,
                              `status` int,
-                             `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                             `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                             `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                              PRIMARY KEY (`id`),
                              FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
                              FOREIGN KEY (`schedule_id`) REFERENCES `schedules`(`id`),
@@ -165,10 +134,6 @@ CREATE TABLE `reminders` (
 CREATE TABLE `reminder_type` (
                                  `id` int NOT NULL AUTO_INCREMENT,
                                  `name` varchar(255),
-                                 `status` int,
-                                 `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                                 `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                 `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                                  PRIMARY KEY (`id`)
 );
 
@@ -180,7 +145,6 @@ CREATE TABLE `posts` (
                          `status` int,
                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                          PRIMARY KEY (`id`),
                          FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 );
@@ -189,10 +153,6 @@ CREATE TABLE `likes` (
                          `id` int NOT NULL AUTO_INCREMENT,
                          `user_id` int,
                          `post_id` int,
-                         `status` int,
-                         `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                         `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `deleted_at` TIMESTAMP NULL DEFAULT NULL,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `unique_like` (`user_id`, `post_id`),
                          FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
@@ -207,7 +167,7 @@ CREATE TABLE `comments` (
                             `status` int,
                             `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                             `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                             PRIMARY KEY (`id`),
                             FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
                             FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`)
@@ -215,10 +175,7 @@ CREATE TABLE `comments` (
 CREATE TABLE `photo_type` (
                               `id` int NOT NULL AUTO_INCREMENT,
                               `name` varchar(255),
-                              `status` int,
-                              `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                              `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                              `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                               PRIMARY KEY (`id`)
 );
 CREATE TABLE `photos` (
@@ -230,10 +187,7 @@ CREATE TABLE `photos` (
                           `exersice_id` int,
                           `dish_id` int,
                           `user_id` int,
-                          `status` int,
-                          `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                          `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+
                           PRIMARY KEY (`id`),
                           FOREIGN KEY (`photo_type`) REFERENCES `photo_type`(`id`),
                           FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
@@ -267,51 +221,12 @@ CREATE TABLE messages (
 );
 ALTER TABLE users ADD COLUMN jwt_secret VARCHAR(255);
 
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`photo_type`) REFERENCES `photo_type` (`id`);
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`comment_id`) REFERENCES `comments` (`id`);
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`dish_id`) REFERENCES `dishes` (`id`);
-
---   ALTER TABLE `photos` ADD FOREIGN KEY (`exersice_id`) REFERENCES `exersices` (`id`);
-
---   ALTER TABLE `comments` ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
-
---   ALTER TABLE `likes` ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
-
---   ALTER TABLE `posts` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---   ALTER TABLE `comments` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---   ALTER TABLE `likes` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---   ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `reminders` (`user_id`);
-
---   ALTER TABLE `reminders` ADD FOREIGN KEY (`reminder_type`) REFERENCES `reminder_type` (`id`);
-
---   ALTER TABLE `schedules` ADD FOREIGN KEY (`id`) REFERENCES `reminders` (`schedule_id`);
-
---   ALTER TABLE `meals` ADD FOREIGN KEY (`id`) REFERENCES `reminders` (`meal_id`);
-
---   ALTER TABLE `schedule_detail` ADD FOREIGN KEY (`exersice_id`) REFERENCES `exersices` (`id`);
-
---   ALTER TABLE `schedule_detail` ADD FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`);
-
---   ALTER TABLE `schedules` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---   ALTER TABLE `exersices` ADD FOREIGN KEY (`exersice_type`) REFERENCES `exersice_type` (`id`);
-
---   ALTER TABLE `meal_detail` ADD FOREIGN KEY (`dish_id`) REFERENCES `dishes` (`id`);
-
---   ALTER TABLE `meal_detail` ADD FOREIGN KEY (`meal_id`) REFERENCES `meals` (`id`);
-
---   ALTER TABLE `meals` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
-
---   ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `accounts` (`user_id`);
-
+CREATE TABLE password_reset_tokens (
+                                       id SERIAL PRIMARY KEY,
+                                       user_id INT NOT NULL,
+                                       token VARCHAR(255) NOT NULL,
+                                       expires_at TIMESTAMP NOT NULL,
+                                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                       FOREIGN KEY (user_id) REFERENCES users(id)
+);

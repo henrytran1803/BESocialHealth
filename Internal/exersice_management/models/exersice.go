@@ -1,7 +1,5 @@
 package exersicemodels
 
-import "BESocialHealth/comon"
-
 //CREATE TABLE `exersice_type` (
 //`id` int NOT NULL AUTO_INCREMENT,
 //`name` varchar(255),
@@ -29,7 +27,7 @@ import "BESocialHealth/comon"
 //);
 
 type Exersice struct {
-	comon.SQLModel
+	Id            int           `json:"id" gorm:"column:id"`
 	Name          string        `json:"name" gorm:"type:varchar(255);not null; column:name" form:"name" binding:"required"`
 	Description   string        `json:"description" gorm:"type:varchar(255);not null" form:"description" binding:"required"`
 	Calorie       float64       `json:"calorie" gorm:"type:decimal(10,2);not null" form:"calorie"`
@@ -40,7 +38,6 @@ type Exersice struct {
 }
 
 type Exersice_type struct {
-	comon.SQLModel
 	Name string `json:"name" gorm:"type:varchar(255);not null" form:"name"`
 }
 
@@ -50,7 +47,7 @@ func (Exersice) TableName() string      { return "exersices" }
 func (Exersice_type) TableName() string { return "exersice_type" }
 
 type Photo struct {
-	comon.SQLModel
+	Id          int    `json:"id" gorm:"column:id"`
 	Photo_type  string `json:"photo_type" gorm:"column:photo_type"`
 	Image       []byte `json:"image" gorm:"column:image"`
 	Url         string `json:"url" gorm:"column:url"`
@@ -67,7 +64,7 @@ type CreateExersice struct {
 	Image         []byte  `json:"image" gorm:"column:image" form:"image" `
 }
 type GetExersiceList struct {
-	comon.SQLModel
+	Id            int           `json:"id" gorm:"column:id"`
 	Name          string        `json:"name" gorm:"type:varchar(255);not null; column:name" form:"name" binding:"required"`
 	Description   string        `json:"description" gorm:"type:varchar(255);not null;column:description" form:"description" binding:"required"`
 	Calorie       float64       `json:"calorie" gorm:"type:decimal(10,2);not null;column:calorie" form:"calorie"`

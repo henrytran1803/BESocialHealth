@@ -4,6 +4,7 @@ import (
 	remindermodels "BESocialHealth/Internal/reminder_management/models"
 	"BESocialHealth/component/appctx"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -51,7 +52,7 @@ func (rc *ReminderChecker) checkReminders() {
 		rc.wsManager.SendToUser(fmt.Sprintf("%d", reminder.UserID), message)
 
 		// Cập nhật trạng thái reminder
-		reminder.Status = 1
+		reminder.Status = strconv.Itoa(1)
 		db.Save(&reminder)
 	}
 }

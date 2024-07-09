@@ -57,6 +57,7 @@ func (r *FoodRepository) GetListFood() ([]foodmodels.GetFood, error) {
 			return nil, err
 		}
 		getFood := foodmodels.GetFood{
+			Id:          food.Id,
 			Name:        food.Name,
 			Description: food.Description,
 			Calorie:     food.Calorie,
@@ -66,7 +67,6 @@ func (r *FoodRepository) GetListFood() ([]foodmodels.GetFood, error) {
 			Sugar:       food.Sugar,
 			Serving:     food.Serving,
 			Photos:      photos,
-			SQLModel:    food.SQLModel,
 		}
 		getFoods = append(getFoods, getFood)
 	}
@@ -105,6 +105,32 @@ func (r *FoodRepository) DeletePhotoByFood(id string) error {
 }
 func (r *FoodRepository) DeletePhotoById(id string) error {
 	if err := r.DB.Table(foodmodels.Photo{}.TableName()).Delete(&foodmodels.Photo{}, "id = ?", id).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (r *FoodRepository) CreatePhotoBase(photo *foodmodels.PhotoBase) error {
+	if err := r.DB.Table(foodmodels.Photo{}.TableName()).Create(photo).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (r *FoodRepository) CreatePhotoListBase(photos []foodmodels.PhotoBase) error {
+	for _, photo := range photos {
+		if err := r.CreatePhotoBase(&photo); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func (r *FoodRepository) UpdatePhotoBase(photo *foodmodels.PhotoBase) error {
+	if err := r.DB.Table(foodmodels.Photo{}.TableName()).Save(photo).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (r *FoodRepository) UpdateFood(food *foodmodels.FoodUpdate) error {
+	if err := r.DB.Table(foodmodels.Food{}.TableName()).Save(food).Error; err != nil {
 		return err
 	}
 	return nil

@@ -1,26 +1,24 @@
 package personalcontentmodels
 
-import "BESocialHealth/comon"
-
 type Post struct {
-	comon.SQLModel
+	Id     int    `json:"id" gorm:"column:id"`
 	Title  string `json:"title" gorm:"column:title"`
 	Body   string `json:"body" gorm:"column:body"`
 	UserId int64  `json:"user_id" gorm:"column:user_id"`
 }
 type Like struct {
-	comon.SQLModel
+	Id     int   `json:"id" gorm:"column:id"`
 	UserId int64 `json:"user_id" gorm:"column:user_id"`
 	PostId int64 `json:"post_id" gorm:"column:post_id"`
 }
 type Comment struct {
-	comon.SQLModel
+	Id     int    `json:"id" gorm:"column:id"`
 	Body   string `json:"body" gorm:"column:body"`
 	UserId int64  `json:"user_id" gorm:"column:user_id"`
 	PostId int64  `json:"post_id" gorm:"column:post_id"`
 }
 type Photo struct {
-	comon.SQLModel
+	Id         int    `json:"id" gorm:"column:id"`
 	Photo_type string `json:"photo_type" gorm:"column:photo_type"`
 	Image      []byte `json:"image" gorm:"column:image"`
 	Url        string `json:"url" gorm:"column:url"`

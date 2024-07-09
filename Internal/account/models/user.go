@@ -1,24 +1,25 @@
 package accountmodels
 
 import (
-	"BESocialHealth/comon"
 	"gorm.io/gorm"
 	"time"
 )
 
 type User struct {
-	Id        int     `gorm:"primaryKey; column:id" json:"id"`
-	Email     string  `gorm:"type:varchar(255);not null; column:email" json:"email"`
-	FirstName string  `gorm:"type:varchar(255); column:firstname" json:"firstname"`
-	LastName  string  `gorm:"type:varchar(255); column:lastname" json:"lastname"`
-	Role      int     `json:"role"`
-	Height    float64 `json:"height"`
-	Weight    float64 `json:"weight"`
-	BDF       float64 `json:"bdf"`
-	TDEE      float64 `json:"tdee"`
-	Calorie   float64 `json:"calorie"`
-	JWTSecret string  `gorm:"column:jwt_secret" json:"jwt_secret"`
-	comon.SQLModel
+	Id        int       `gorm:"primaryKey; column:id" json:"id"`
+	Email     string    `gorm:"type:varchar(255);not null; column:email" json:"email"`
+	FirstName string    `gorm:"type:varchar(255); column:firstname" json:"firstname"`
+	LastName  string    `gorm:"type:varchar(255); column:lastname" json:"lastname"`
+	Role      int       `json:"role"`
+	Height    float64   `json:"height"`
+	Weight    float64   `json:"weight"`
+	BDF       float64   `json:"bdf"`
+	TDEE      float64   `json:"tdee"`
+	Calorie   float64   `json:"calorie"`
+	JWTSecret string    `gorm:"column:jwt_secret" json:"jwt_secret"`
+	Status    int       `gorm:"default:0; column:status" json:"status"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
 func (User) TableName() string { return "users" }

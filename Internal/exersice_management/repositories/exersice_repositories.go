@@ -18,12 +18,12 @@ func (r *ExersiceRepository) GetListExersice() ([]exersicemodels.GetExersiceList
 			return nil, err
 		}
 		getExersice := exersicemodels.GetExersiceList{
+			Id:           exersice.Id,
 			Name:         exersice.Name,
 			Description:  exersice.Description,
 			Calorie:      exersice.Calorie,
 			Rep_serving:  exersice.Rep_serving,
 			Time_serving: exersice.Time_serving,
-			SQLModel:     exersice.SQLModel,
 			Photo:        photos,
 		}
 		getExersices = append(getExersices, getExersice)

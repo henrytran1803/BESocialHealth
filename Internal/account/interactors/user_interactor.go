@@ -82,3 +82,13 @@ func (i *AccountInteractor) ResetPassword(token string, newPassword string) erro
 
 	return nil
 }
+func (i *AccountInteractor) ChangePass(account *accountmodels.Account) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	if err := i.AccountRepository.UpdatePassword(uint(account.UserId), string(hashedPassword)); err != nil {
+		return err
+	}
+	return nil
+}

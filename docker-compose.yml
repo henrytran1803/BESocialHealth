@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 18032002
+      MYSQL_DATABASE: sqltttn
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - mynetwork
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_CONN_STRING: "root:18032002@tcp(mysql:3306)/sqltttn?charset=utf8mb4&parseTime=True&loc=Local"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

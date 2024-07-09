@@ -2,6 +2,7 @@ package accounthandlers
 
 import (
 	accountinteractors "BESocialHealth/Internal/account/interactors"
+	accountmodels "BESocialHealth/Internal/account/models"
 	accountrepositories "BESocialHealth/Internal/account/repositories"
 	"BESocialHealth/component/appctx"
 	"github.com/gin-gonic/gin"
@@ -51,5 +52,21 @@ func ConfirmPasswordResetHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Password has been reset"})
+	}
+}
+func ChangePasswordHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var account accountmodels.Account
+		if err := c.ShouldBindJSON(&account); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		}
+		db := appctx.GetMainDBConnection()
+		roleRepo := accountrepositories.NewAccountRepository(db)
+		accountInteractor := accountinteractors.NewAccountInteractor(roleRepo)
+		if err := accountInteractor.ChangePass(&account); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Password has been changed"})
+
 	}
 }

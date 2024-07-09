@@ -1,7 +1,6 @@
 package remindermodels
 
 import (
-	"BESocialHealth/comon"
 	"time"
 )
 
@@ -13,7 +12,7 @@ type Reminder struct {
 	MealID         *int      `json:"meal_id" gorm:"not null ;column:meal_id"`
 	ReminderTypeID int       `json:"reminder_type_id" gorm:"column:reminder_type" `
 	Date           time.Time `json:"date" gorm:"column:date" `
-	comon.SQLModel
+	Status         string    `json:"status" gorm:"column:status" `
 }
 
 func (Reminder) TableName() string { return "reminders" }
@@ -21,7 +20,6 @@ func (Reminder) TableName() string { return "reminders" }
 type ReminderType struct {
 	ID   int    `json:"ID" gorm:"primary_key; column:id"`
 	Name string `json:"Name" gorm:"type:varchar(255); comment:'name'"`
-	comon.SQLModel
 }
 type ReminderCreate struct {
 	ID             int       `json:"id" gorm:"primary_key; column:id"`
@@ -31,4 +29,5 @@ type ReminderCreate struct {
 	MealID         *int      `json:"meal_id" gorm:"not null ;column:meal_id"`
 	ReminderTypeID int       `json:"reminder_type_id" gorm:"column:reminder_type" `
 	Date           time.Time `json:"date" gorm:"column:date" `
+	Status         string    `json:"status" gorm:"column:status" `
 }

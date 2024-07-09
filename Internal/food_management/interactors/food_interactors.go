@@ -75,10 +75,41 @@ func (i *FoodInteractor) UpdateFood(food *foodmodels.Food, imageData []byte, fil
 	}
 	return nil
 }
+func (i *FoodInteractor) UpdateFoodNonePhoto(food *foodmodels.FoodUpdate) error {
+	err := i.FoodRepository.UpdateFood(food)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (i *FoodInteractor) GetListFood() ([]foodmodels.GetFood, error) {
 	foods, err := i.FoodRepository.GetListFood()
 	if err != nil {
 		return nil, err
 	}
 	return foods, nil
+}
+func (i *FoodInteractor) DeletePhotoById(id int) error {
+	err := i.FoodRepository.DeletePhotoById(strconv.Itoa(id))
+	if err != nil {
+		return err
+	}
+	if err := i.FoodRepository.DeletePhotoByFood(strconv.Itoa(id)); err != nil {
+		return err
+	}
+	return nil
+}
+func (i *FoodInteractor) CreatePhoto(photo *foodmodels.PhotoBase) error {
+	err := i.FoodRepository.CreatePhotoBase(photo)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (i *FoodInteractor) CreateListPhoto(photos []foodmodels.PhotoBase) error {
+	err := i.FoodRepository.CreatePhotoListBase(photos)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,7 +1,6 @@
 package mealmodels
 
 import (
-	"BESocialHealth/comon"
 	"time"
 )
 
@@ -33,7 +32,6 @@ type GetMeal struct {
 	Date         *time.Time `json:"date" gorm:"column:date"`
 	TotalCalorie float64    `json:"total_calorie" gorm:"column:total_calorie"`
 	Dishes       []GetDish  `json:"dishes" gorm:"foreignKey:MealId"`
-	comon.SQLModel
 }
 
 func (GetMeal) TableName() string {
@@ -46,7 +44,6 @@ type GetDish struct {
 	MealId  int     `json:"meal_id" gorm:"column:meal_id"`
 	Serving float64 `json:"serving" gorm:"column:serving"`
 	Calorie float64 `json:"calorie" gorm:"column:calorie"`
-	comon.SQLModel
 }
 
 func (GetDish) TableName() string {

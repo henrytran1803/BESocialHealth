@@ -1,7 +1,6 @@
 package schedulemodels
 
 import (
-	"BESocialHealth/comon"
 	"time"
 )
 
@@ -34,13 +33,13 @@ import (
 // FOREIGN KEY (`exersice_id`) REFERENCES `exersices`(`id`)
 // );
 type Schedule struct {
-	comon.SQLModel
+	Id       int        `json:"id" gorm:"column:id"`
 	User_id  int64      `json:"user_id" gorm:"column:user_id;not null"`
 	Time     *time.Time `json:"time" gorm:"column:time;not null"`
 	Calories float32    `json:"calories" gorm:"column:calories;not null"`
 }
 type ScheduleDetail struct {
-	comon.SQLModel
+	Id          int `json:"id" gorm:"column:id"`
 	Schedule_id int `json:"schedule_id" gorm:"column:schedule_id;not null"`
 	Exersice_id int `json:"exersice_id" gorm:"column:exersice_id;not null"`
 	Rep         int `json:"rep" gorm:"column:rep"`
@@ -69,7 +68,7 @@ type ScheduleDetailCreate struct {
 	Time        int `json:"time" gorm:"column:time"`
 }
 type ScheduleGet struct {
-	comon.SQLModel
+	Id       int              `json:"id" gorm:"column:id"`
 	User_id  int64            `json:"user_id" gorm:"column:user_id;not null"`
 	Time     *time.Time       `json:"time" gorm:"column:time;not null"`
 	Calories float32          `json:"calories" gorm:"column:calories;not null"`
