@@ -108,3 +108,40 @@ func (r *AccountRepository) UpdatePassword(userID uint, hashedPassword string) e
 func (r *AccountRepository) DeletePasswordResetToken(token string) error {
 	return r.DB.Table(accountmodels.PasswordResetToken{}.TableName()).Where("token = ?", token).Delete(&accountmodels.PasswordResetToken{}).Error
 }
+
+func (r *DashboardRepository) GetDashboardData() (*accountmodels.DashBoard, error) {
+	var allUsersCount, disabledUsersCount, postsCount, foodCount, exercisesCount, photosCount int64
+
+	if err := r.DB.Table("users").Count(&allUsersCount).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Table("users").Where("status = ?", 1).Count(&disabledUsersCount).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Table("posts").Count(&postsCount).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Table("dishes").Count(&foodCount).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Table("exersices").Count(&exercisesCount).Error; err != nil {
+		return nil, err
+	}
+	if err := r.DB.Table("photos").Count(&photosCount).Error; err != nil {
+		return nil, err
+	}
+
+	activeUsers := r.Manager.GetActiveUsers()
+	activeUserCount := len(activeUsers)
+
+	return &accountmodels.DashBoard{
+		All_user:       int(allUsersCount),
+		User_disable:   int(disabledUsersCount),
+		Count_posts:    int(postsCount),
+		Count_food:     int(foodCount),
+		Count_exersice: int(exercisesCount),
+		Count_photos:   int(photosCount),
+		Active_user:    activeUserCount,
+		List_active:    activeUsers,
+	}, nil
+}

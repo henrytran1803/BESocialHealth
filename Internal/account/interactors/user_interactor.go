@@ -20,6 +20,15 @@ func NewAccountInteractor(repo *accountrepositories.AccountRepository) *AccountI
 	}
 }
 
+type DashBoardInteractor struct {
+	DashboardRepository *accountrepositories.DashboardRepository
+}
+
+func NewDashBoardInteractor(repo *accountrepositories.DashboardRepository) *DashBoardInteractor {
+	return &DashBoardInteractor{
+		DashboardRepository: repo,
+	}
+}
 func (i *AccountInteractor) CreateAccount(user *accountmodels.CreateAccount) error {
 	exists, err := i.AccountRepository.CheckExists(user.Email)
 	if err != nil {
@@ -91,4 +100,12 @@ func (i *AccountInteractor) ChangePass(account *accountmodels.Account) error {
 		return err
 	}
 	return nil
+}
+
+func (i *DashBoardInteractor) GetDashboard() (*accountmodels.DashBoard, error) {
+	dashboard, err := i.DashboardRepository.GetDashboardData()
+	if err != nil {
+		return nil, err
+	}
+	return dashboard, nil
 }

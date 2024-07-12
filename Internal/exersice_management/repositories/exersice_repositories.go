@@ -17,20 +17,32 @@ func (r *ExersiceRepository) GetListExersice() ([]exersicemodels.GetExersiceList
 		if err := r.DB.Where("exersice_id = ?", exersice.Id).Find(&photos).Error; err != nil {
 			return nil, err
 		}
+		idex, err := r.FindExersiceTypeByID(exersice.Exersice_type)
+		if err != nil {
+			return nil, err
+		}
+
 		getExersice := exersicemodels.GetExersiceList{
-			Id:           exersice.Id,
-			Name:         exersice.Name,
-			Description:  exersice.Description,
-			Calorie:      exersice.Calorie,
-			Rep_serving:  exersice.Rep_serving,
-			Time_serving: exersice.Time_serving,
-			Photo:        photos,
+			Id:            exersice.Id,
+			Name:          exersice.Name,
+			Description:   exersice.Description,
+			Calorie:       exersice.Calorie,
+			Rep_serving:   exersice.Rep_serving,
+			Time_serving:  exersice.Time_serving,
+			Exersice_type: *idex,
+			Photo:         photos,
 		}
 		getExersices = append(getExersices, getExersice)
 	}
 	return getExersices, nil
 }
-
+func (r *ExersiceRepository) FindExersiceTypeByID(id int) (*exersicemodels.Exersice_type, error) {
+	var exersice exersicemodels.Exersice_type
+	if err := r.DB.Where("id = ?", id).First(&exersice).Error; err != nil {
+		return nil, err
+	}
+	return &exersice, nil
+}
 func (r *ExersiceRepository) CreateExersice(exersice *exersicemodels.Exersice) error {
 	return r.DB.Table(exersicemodels.Exersice{}.TableName()).Create(&exersice).Error
 }
@@ -84,6 +96,12 @@ func (r *ExersiceRepository) DeletePhotoById(id int) error {
 
 func (r *ExersiceRepository) DeletePhotoByExersice(exerciseId int) error {
 	if err := r.DB.Table(exersicemodels.Photo{}.TableName()).Where("exercise_id = ?", exerciseId).Delete(&exersicemodels.Photo{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (r *ExersiceRepository) UpdateExersiceNonePhoto(exersice *exersicemodels.Exersice) error {
+	if err := r.DB.Table(exersicemodels.Exersice{}.TableName()).Save(exersice).Error; err != nil {
 		return err
 	}
 	return nil

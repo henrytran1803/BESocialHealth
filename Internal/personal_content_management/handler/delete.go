@@ -26,7 +26,7 @@ func DeletePostHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		if err := postInteractor.DeletePostById(idconv); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusNoContent, gin.H{"message": "post deleted successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "post deleted successfully"})
 	}
 }
 
@@ -43,6 +43,6 @@ func DeleteLikeByUserIdAndPostIdHandler(appctx appctx.AppContext) gin.HandlerFun
 		if err := postInteractor.DeleteLikeByUserIDAndPostId(int(like.UserId), int(like.PostId)); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusNoContent, gin.H{"message": "post deleted successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "post deleted successfully"})
 	}
 }

@@ -56,6 +56,20 @@ type PasswordResetToken struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+type DashBoard struct {
+	All_user       int          `json:"all_user"`
+	User_disable   int          `json:"user_disable"`
+	Count_posts    int          `json:"count_posts"`
+	Count_food     int          `json:"count_food"`
+	Count_exersice int          `json:"count_exersice"`
+	Count_photos   int          `json:"count_photos"`
+	Active_user    int          `json:"active_user"`
+	List_active    []UserActive `json:"list_active"`
+}
+type UserActive struct {
+	Id_user   string    `gorm:"primaryKey" json:"id_user"`
+	LastLogin time.Time `json:"last_login"`
+}
 
 func (PasswordResetToken) TableName() string { return "password_reset_tokens" }
 func (Account) TableName() string            { return "accounts" }

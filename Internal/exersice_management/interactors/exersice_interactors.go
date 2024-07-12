@@ -80,3 +80,9 @@ func (i *ExersiceInteractor) GetAllExersice() ([]exersicemodels.GetExersiceList,
 	}
 	return exersices, nil
 }
+func (i *ExersiceInteractor) UpdateExersiceNonePhoto(exersice *exersicemodels.Exersice) error {
+	if err := i.ExersiceRepository.UpdateExersiceNonePhoto(exersice); err != nil {
+		return err
+	}
+	return nil
+}

@@ -27,17 +27,18 @@ package exersicemodels
 //);
 
 type Exersice struct {
-	Id            int           `json:"id" gorm:"column:id"`
-	Name          string        `json:"name" gorm:"type:varchar(255);not null; column:name" form:"name" binding:"required"`
+	Id            int           `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name          string        `json:"name" gorm:"type:varchar(255);not null" form:"name" binding:"required"`
 	Description   string        `json:"description" gorm:"type:varchar(255);not null" form:"description" binding:"required"`
 	Calorie       float64       `json:"calorie" gorm:"type:decimal(10,2);not null" form:"calorie"`
 	Rep_serving   int           `json:"rep_serving" gorm:"type:int(11);not null" form:"rep_serving"`
 	Time_serving  int           `json:"time_serving" gorm:"type:int(11);not null" form:"time_serving"`
-	Exersice_type int           `json:"exersice_type"`
-	ExersiceType  Exersice_type `gorm:"foreignKey:Exersice_type"`
+	Exersice_type int           `json:"exersice_type" gorm:"not null"`
+	ExersiceType  Exersice_type `gorm:"foreignKey:Exersice_type;references:Id"`
 }
 
 type Exersice_type struct {
+	Id   int    `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"type:varchar(255);not null" form:"name"`
 }
 

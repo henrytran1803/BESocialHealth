@@ -61,3 +61,19 @@ func UpdateExersiceHandeler(appctx appctx.AppContext) gin.HandlerFunc {
 
 	}
 }
+func UpdateExersiceNonePhotoById(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var exersice exersicemodels.Exersice
+		if err := c.ShouldBindWith(&exersice, binding.JSON); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		}
+		db := appctx.GetMainDBConnection()
+		exersiceRepo := exersicerepositories.NewExersiceRepository(db)
+		exersiceInteractor := interactors.NewExersiceInteractor(exersiceRepo)
+		if err := exersiceInteractor.UpdateExersiceNonePhoto(&exersice); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	}
+}

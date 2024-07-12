@@ -17,6 +17,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
 	"os"
 	"time"
 )
@@ -33,17 +34,38 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	//db.AutoMigrate(&usermodel.User{})
 	r := gin.Default()
 	appctx := appctx.NewAppContext(db)
-
 	v1 := r.Group("/v1")
+
+	//ws
+
+	manager := ws.NewWebSocketManager()
+	r.GET("/ws", func(c *gin.Context) {
+		manager.WebSocketHandler(c.Writer, c.Request)
+	})
+	r.POST("/broadcast", func(c *gin.Context) {
+		var message struct {
+			Message string `json:"message"`
+		}
+		if err := c.BindJSON(&message); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			return
+		}
+		manager.BroadcastToAll(message.Message)
+		c.JSON(http.StatusOK, gin.H{"status": "Message broadcasted"})
+	})
+	// Reminder Checker
+	reminderChecker := ws.NewReminderChecker(appctx, manager, 1*time.Minute) // Kiểm tra mỗi phút một lần
+	reminderChecker.Start()
+
 	// account
 	account := v1.Group("/account")
 	account.POST("/register", accounthandlers.CreateAccountHandler(appctx))
 	account.POST("/login", accounthandlers.LoginHandler(appctx))
 	account.POST("/requestpassword", accounthandlers.RequestPasswordResetHandler(appctx))
 	account.POST("/confirmpassword", accounthandlers.ConfirmPasswordResetHandler(appctx))
+	account.GET("/dashboard", accounthandlers.DashBoardHandler(appctx, manager))
 
 	// food
 	food := v1.Group("/food")
@@ -66,7 +88,7 @@ func main() {
 	exersice.DELETE("/:id", exersicehandler.DeleteExersiceHandler(appctx))
 	exersice.GET("", exersicehandler.GetistExersiceHandler(appctx))
 	exersice.GET("/:id", exersicehandler.GetExersiceByIdHandler(appctx))
-
+	exersice.PUT("", exersicehandler.UpdateExersiceNonePhotoById(appctx))
 	//user
 	user := v1.Group("/user")
 	user.Use(middleware.AuthMiddleware(appctx))
@@ -80,7 +102,6 @@ func main() {
 	//meal
 	meal := v1.Group("/meal")
 	meal.Use(middleware.AuthMiddleware(appctx))
-
 	meal.POST("", mealhandler.CreateMealHandler(appctx))
 	meal.GET("/user/:id", mealhandler.GetMealsByUserIdHandler(appctx))
 	meal.GET("/:id", mealhandler.GetMealByIdHandler(appctx))
@@ -91,7 +112,6 @@ func main() {
 	//content
 	content := v1.Group("/content")
 	content.Use(middleware.AuthMiddleware(appctx))
-
 	content.POST("", personalcontenthandler.CreatePostHandler(appctx))
 	content.POST("/like", personalcontenthandler.LikeHandler(appctx))
 	content.DELETE("/like", personalcontenthandler.DeleteLikeByUserIdAndPostIdHandler(appctx))
@@ -104,7 +124,6 @@ func main() {
 	// schedule
 	schedule := v1.Group("/schedule")
 	schedule.Use(middleware.AuthMiddleware(appctx))
-
 	schedule.POST("", schedulehandler.CreateScheduleHandler(appctx))
 	schedule.POST("/detail", schedulehandler.CreateScheduleDetailHandler(appctx))
 	schedule.GET("", schedulehandler.GetAllScheduleHandler(appctx))
@@ -121,9 +140,9 @@ func main() {
 	message.POST("/messages", messagehandler.SendMessageHandler(appctx))
 	message.GET("/users/:user_id/conversations", messagehandler.ListUserConversationsHandler(appctx))
 	message.GET("/:conversation_id/messages", messagehandler.ListConversationMessagesHandler(appctx))
-	//làm thêm delete nữa
-	// reminder
+	// delete
 
+	// reminder
 	reminder := v1.Group("/reminder")
 	reminder.Use(middleware.AuthMiddleware(appctx))
 	reminder.POST("", reminderhandler.CreateReminderHandler(appctx))
@@ -132,14 +151,6 @@ func main() {
 	reminder.DELETE("/:id", reminderhandler.DeleteReminderByIdHandler(appctx))
 	reminder.GET("/user/:id", reminderhandler.GetReminderByIdHandler(appctx))
 
-	//ws
-	manager := ws.NewWebSocketManager()
-	r.GET("/ws", func(c *gin.Context) {
-		manager.WebSocketHandler(c.Writer, c.Request)
-	})
-	// Reminder Checker
-	reminderChecker := ws.NewReminderChecker(appctx, manager, 1*time.Minute) // Kiểm tra mỗi phút một lần
-	reminderChecker.Start()
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
