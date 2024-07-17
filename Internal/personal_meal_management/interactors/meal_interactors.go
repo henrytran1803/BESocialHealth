@@ -15,11 +15,12 @@ func NewMealInteractor(repo *mealrepositories.MealRepository) *MealInteractor {
 	}
 }
 
-func (i *MealInteractor) CreateMeal(meal *mealmodels.Meal) error {
-	if err := i.MealRepository.CreateMeal(meal); err != nil {
-		return err
+func (i *MealInteractor) CreateMeal(meal *mealmodels.Meal) (*int, error) {
+	id, err := i.MealRepository.CreateMeal(meal)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return id, nil
 }
 func (i *MealInteractor) GetMeal(id string) (*mealmodels.GetMeal, error) {
 	meal, err := i.MealRepository.GetMealById(id)
@@ -58,4 +59,22 @@ func (i *MealInteractor) DeleteMealDetail(id string) error {
 		return err
 	}
 	return nil
+}
+func (i *MealInteractor) GetMealByDate(id string, date string) (*mealmodels.GetMeal, error) {
+	meal, err := i.MealRepository.GetMealByDate(&id, &date)
+	if err != nil {
+		return nil, err
+	}
+	if meal == nil {
+		return nil, nil
+	}
+	return meal, nil
+}
+func (i *MealInteractor) GetInfomationCalories(id string, date string) (*float64, *float64, *float64, *mealmodels.MealNutrientTotals, error) {
+
+	meal, schedule, calorie, nutritions, err := i.MealRepository.GetInformationCalories(id, date)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+	return meal, schedule, calorie, nutritions, nil
 }

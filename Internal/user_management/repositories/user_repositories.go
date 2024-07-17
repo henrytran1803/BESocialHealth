@@ -20,7 +20,7 @@ func (r *UserRepository) GetAllUser() (*[]usermodels.User, error) {
 	return &users, nil
 }
 
-func (r *UserRepository) UpdateUser(user *usermodels.UserDetail) error {
+func (r *UserRepository) UpdateUser(user *usermodels.User) error {
 	if err := r.DB.Table(usermodels.User{}.TableName()).Save(user).Error; err != nil {
 		return err
 	}

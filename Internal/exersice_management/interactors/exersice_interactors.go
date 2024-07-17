@@ -58,12 +58,13 @@ func (i *ExersiceInteractor) UpdateExersice(id int, exersice *exersicemodels.Exe
 	return nil
 }
 func (i *ExersiceInteractor) DeleteExersice(id int) error {
-	if err := i.ExersiceRepository.DeleteExersiceById(id); err != nil {
-		return err
-	}
 	if err := i.ExersiceRepository.DeletePhotoByExersice(id); err != nil {
 		return err
 	}
+	if err := i.ExersiceRepository.DeleteExersiceById(id); err != nil {
+		return err
+	}
+
 	return nil
 }
 func (i *ExersiceInteractor) GetExersice(id int) (*exersicemodels.Exersice, error) {
@@ -85,4 +86,11 @@ func (i *ExersiceInteractor) UpdateExersiceNonePhoto(exersice *exersicemodels.Ex
 		return err
 	}
 	return nil
+}
+func (i *ExersiceInteractor) GetAllExType() (*[]exersicemodels.Exersice_type, error) {
+	exersices, err := i.ExersiceRepository.GetAllExtype()
+	if err != nil {
+		return nil, err
+	}
+	return exersices, nil
 }

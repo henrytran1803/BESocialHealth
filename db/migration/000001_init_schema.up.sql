@@ -230,3 +230,189 @@ CREATE TABLE password_reset_tokens (
                                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                        FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_total_calorie_burn(schedule_id INT)
+BEGIN
+    DECLARE total_calories DOUBLE DEFAULT 0;
+
+    -- Tổng calo đốt cháy cho mỗi chi tiết lịch trình
+SELECT SUM(
+               CASE
+                   WHEN sd.rep IS NOT NULL AND e.rep_serving IS NOT NULL THEN e.calorie * sd.rep / e.rep_serving
+                   WHEN sd.time IS NOT NULL AND e.time_serving IS NOT NULL THEN e.calorie * sd.time / e.time_serving
+                   ELSE 0
+                   END
+       ) INTO total_calories
+FROM schedule_detail sd
+         JOIN exersices e ON sd.exersice_id = e.id
+WHERE sd.schedule_id = schedule_id;
+
+-- Cập nhật tổng calo trong bảng schedules
+UPDATE schedules
+SET calories_burn = total_calories
+WHERE id = schedule_id;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER before_exersice_update
+    AFTER UPDATE ON exersices
+    FOR EACH ROW
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE sched_id INT;
+    DECLARE cur CURSOR FOR
+    SELECT s.id
+    FROM schedules s
+             JOIN schedule_detail sd ON s.id = sd.schedule_id
+    WHERE sd.exersice_id = NEW.id;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO sched_id;
+        IF done THEN
+            LEAVE read_loop;
+END IF;
+CALL sp_total_calorie_burn(sched_id);
+END LOOP;
+
+CLOSE cur;
+END$$
+
+DELIMITER ;
+DELIMITER $$
+
+CREATE TRIGGER after_insert_schedule_detail
+    AFTER INSERT ON schedule_detail
+    FOR EACH ROW
+BEGIN
+    CALL sp_total_calorie_burn(NEW.schedule_id);
+    END$$
+    DELIMITER ;
+    DELIMITER $$
+
+    CREATE TRIGGER after_delete_schedule_detail
+        AFTER DELETE ON schedule_detail
+        FOR EACH ROW
+    BEGIN
+        -- Gọi stored procedure để cập nhật tổng calo cho lịch trình sau khi xóa chi tiết lịch trình
+        CALL sp_total_calorie_burn(OLD.schedule_id);
+        END$$
+
+        DELIMITER ;
+    DELIMITER $$
+
+        CREATE TRIGGER after_update_schedule_detail
+            AFTER UPDATE ON schedule_detail
+            FOR EACH ROW
+        BEGIN
+            -- Gọi stored procedure để cập nhật tổng calo cho lịch trình sau khi thêm chi tiết lịch trình
+            CALL sp_total_calorie_burn(NEW.schedule_id);
+            END$$
+            DELIMITER ;
+
+
+DELIMITER $$
+
+            CREATE PROCEDURE sp_update_total_calorie()
+            BEGIN
+    -- Cập nhật tổng calo cho từng meal_id
+            UPDATE meals m
+                JOIN (
+                SELECT md.meal_id, SUM(d.calorie * md.serving / d.serving) AS total_calorie
+                FROM meal_detail md
+                JOIN dishes d ON md.dish_id = d.id
+                GROUP BY md.meal_id
+                ) AS calorie_summary ON m.id = calorie_summary.meal_id
+                SET m.total_calorie = calorie_summary.total_calorie;
+            END$$
+
+            DELIMITER ;
+
+
+
+DELIMITER $$
+
+            -- Stored Procedure để cập nhật tổng calo cho các bữa ăn chứa dish_id cụ thể
+            CREATE PROCEDURE sp_update_total_calorie_by_dish(dish_id INT)
+            BEGIN
+    -- Cập nhật tổng calo cho từng meal_id chứa dish_id cụ thể
+            UPDATE meals m
+                JOIN (
+                SELECT md.meal_id, SUM(d.calorie * md.serving / d.serving) AS total_calorie
+                FROM meal_detail md
+                JOIN dishes d ON md.dish_id = d.id
+                WHERE md.dish_id = dish_id
+                GROUP BY md.meal_id
+                ) AS calorie_summary ON m.id = calorie_summary.meal_id
+                SET m.total_calorie = calorie_summary.total_calorie;
+            END$$
+
+            -- Trigger cho sự kiện UPDATE trên bảng dishes
+            CREATE TRIGGER after_update_dish
+                AFTER UPDATE ON dishes
+                FOR EACH ROW
+            BEGIN
+                -- Gọi stored procedure để cập nhật tổng calo cho các bữa ăn chứa dish_id cụ thể
+                CALL sp_update_total_calorie_by_dish(NEW.id);
+                END$$
+
+                DELIMITER ;
+DELIMITER $$
+
+                CREATE PROCEDURE sp_update_total_calorie_by_meal(meal_id INT)
+                BEGIN
+    -- Cập nhật tổng calo cho meal_id cụ thể
+                UPDATE meals m
+                    JOIN (
+                    SELECT md.meal_id, SUM(d.calorie * md.serving / d.serving) AS total_calorie
+                    FROM meal_detail md
+                    JOIN dishes d ON md.dish_id = d.id
+                    WHERE md.meal_id = meal_id
+                    GROUP BY md.meal_id
+                    ) AS calorie_summary ON m.id = calorie_summary.meal_id
+                    SET m.total_calorie = calorie_summary.total_calorie;
+                END$$
+
+                DELIMITER ;
+
+DELIMITER $$
+
+                -- Trigger cho sự kiện INSERT trên bảng meal_detail
+                CREATE TRIGGER after_insert_meal_detail
+                    AFTER INSERT ON meal_detail
+                    FOR EACH ROW
+                BEGIN
+                    -- Gọi stored procedure để cập nhật tổng calo cho bữa ăn chứa chi tiết vừa thêm
+                    CALL sp_update_total_calorie_by_meal(NEW.meal_id);
+                    END$$
+
+                    -- Trigger cho sự kiện UPDATE trên bảng meal_detail
+                    CREATE TRIGGER after_update_meal_detail
+                        AFTER UPDATE ON meal_detail
+                        FOR EACH ROW
+                    BEGIN
+                        -- Gọi stored procedure để cập nhật tổng calo cho bữa ăn chứa chi tiết vừa cập nhật
+                        CALL sp_update_total_calorie_by_meal(NEW.meal_id);
+                        END$$
+
+                        -- Trigger cho sự kiện DELETE trên bảng meal_detail
+                        CREATE TRIGGER after_delete_meal_detail
+                            AFTER DELETE ON meal_detail
+                            FOR EACH ROW
+                        BEGIN
+                            -- Gọi stored procedure để cập nhật tổng calo cho bữa ăn chứa chi tiết vừa xóa
+                            CALL sp_update_total_calorie_by_meal(OLD.meal_id);
+                            END$$
+
+                            DELIMITER ;

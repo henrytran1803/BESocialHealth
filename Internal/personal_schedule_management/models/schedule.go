@@ -34,14 +34,14 @@ import (
 // );
 type Schedule struct {
 	Id       int        `json:"id" gorm:"column:id"`
-	User_id  int64      `json:"user_id" gorm:"column:user_id;not null"`
-	Time     *time.Time `json:"time" gorm:"column:time;not null"`
-	Calories float32    `json:"calories" gorm:"column:calories;not null"`
+	User_id  int64      `json:"user_id" gorm:"column:user_id;"`
+	Time     *time.Time `json:"time" gorm:"column:time;"`
+	Calories float32    `json:"calories" gorm:"column:calories;"`
 }
 type ScheduleDetail struct {
 	Id          int `json:"id" gorm:"column:id"`
-	Schedule_id int `json:"schedule_id" gorm:"column:schedule_id;not null"`
-	Exersice_id int `json:"exersice_id" gorm:"column:exersice_id;not null"`
+	Schedule_id int `json:"schedule_id" gorm:"column:schedule_id;"`
+	Exersice_id int `json:"exersice_id" gorm:"column:exersice_id;"`
 	Rep         int `json:"rep" gorm:"column:rep"`
 	Time        int `json:"time" gorm:"column:time"`
 }
@@ -68,9 +68,11 @@ type ScheduleDetailCreate struct {
 	Time        int `json:"time" gorm:"column:time"`
 }
 type ScheduleGet struct {
-	Id       int              `json:"id" gorm:"column:id"`
-	User_id  int64            `json:"user_id" gorm:"column:user_id;not null"`
-	Time     *time.Time       `json:"time" gorm:"column:time;not null"`
-	Calories float32          `json:"calories" gorm:"column:calories;not null"`
-	Detail   []ScheduleDetail `json:"detail"`
+	Id        int              `json:"id" gorm:"column:id"`
+	User_id   int64            `json:"user_id" gorm:"column:user_id;"`
+	Time      *time.Time       `json:"time" gorm:"column:time;not null"`
+	Calories  float32          `json:"calories" gorm:"column:calories_burn"`
+	Status    int              `json:"status" gorm:"column:status"`
+	Create_at time.Time        `json:"create_at" gorm:"column:create_at;"`
+	Detail    []ScheduleDetail `json:"detail" gorm:"foreignKey:schedule_id;references:id"`
 }

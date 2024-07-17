@@ -36,3 +36,19 @@ func GetScheduleByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"data": schedules})
 	}
 }
+
+func GetScheduleByDateHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		date := c.Param("date")
+		db := appctx.GetMainDBConnection()
+		repo := schedulerepositories.NewScheduleRepository(db)
+		scheduleInteractor := scheduleinteractors.NewScheduleInteractor(repo)
+		schedules, err := scheduleInteractor.GetScheduleBydate(&id, &date)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		}
+		c.JSON(http.StatusOK, gin.H{"data": schedules})
+	}
+}

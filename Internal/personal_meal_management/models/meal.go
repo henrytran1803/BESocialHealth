@@ -49,3 +49,10 @@ type GetDish struct {
 func (GetDish) TableName() string {
 	return "meal_detail"
 }
+
+type MealNutrientTotals struct {
+	TotalProtein float64 `json:"total_protein"`
+	TotalFat     float64 `json:"total_fat"`
+	TotalCarb    float64 `json:"total_carb"`
+	TotalSugar   float64 `json:"total_sugar"`
+}

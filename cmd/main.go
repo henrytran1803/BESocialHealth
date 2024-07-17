@@ -89,6 +89,7 @@ func main() {
 	exersice.GET("", exersicehandler.GetistExersiceHandler(appctx))
 	exersice.GET("/:id", exersicehandler.GetExersiceByIdHandler(appctx))
 	exersice.PUT("", exersicehandler.UpdateExersiceNonePhotoById(appctx))
+	exersice.GET("/type", exersicehandler.GetAllExTypeHandler(appctx))
 	//user
 	user := v1.Group("/user")
 	user.Use(middleware.AuthMiddleware(appctx))
@@ -106,9 +107,12 @@ func main() {
 	meal.GET("/user/:id", mealhandler.GetMealsByUserIdHandler(appctx))
 	meal.GET("/:id", mealhandler.GetMealByIdHandler(appctx))
 	meal.POST("/detail", mealhandler.CreateMealDetailHandler(appctx))
-	meal.PUT("/detail", mealhandler.UpdateMealDetail(appctx))
+	meal.PUT("/detail/:id", mealhandler.UpdateMealDetail(appctx))
 	meal.DELETE("/:id", mealhandler.DeleteMealById(appctx))
 	meal.DELETE("/detail/:id", mealhandler.DeleteDetailMealById(appctx))
+	meal.GET("/user/:id/date/:date", mealhandler.GetMealByDateHandler(appctx))
+	meal.GET("/calorie/user/:id/date/:date", mealhandler.GetInfomationCaloriesHandler(appctx))
+
 	//content
 	content := v1.Group("/content")
 	content.Use(middleware.AuthMiddleware(appctx))
@@ -132,7 +136,7 @@ func main() {
 	schedule.PUT("/detail", schedulehandler.UpdateScheduleDetailHandler(appctx))
 	schedule.DELETE("/:id", schedulehandler.DeleteScheduleHandler(appctx))
 	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
-
+	schedule.GET("/user/:id/date/:date", schedulehandler.GetScheduleByDateHandler(appctx))
 	// message
 	message := v1.Group("/conversation")
 	message.Use(middleware.AuthMiddleware(appctx))

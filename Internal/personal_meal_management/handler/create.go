@@ -19,10 +19,11 @@ func CreateMealHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		mealRepo := mealrepositories.NewMealRepository(db)
 		mealInteractor := mealinteractors.NewMealInteractor(mealRepo)
 
-		if err := mealInteractor.CreateMeal(&meal); err != nil {
+		id, err := mealInteractor.CreateMeal(&meal)
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"data": meal})
+		c.JSON(http.StatusOK, gin.H{"id": id})
 
 	}
 }
@@ -38,7 +39,6 @@ func CreateMealDetailHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		if err := mealInteractor.CreateMealDetail(&mealdetail); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"data": mealdetail})
-
+		c.JSON(http.StatusOK, gin.H{"data": mealdetail})
 	}
 }

@@ -35,3 +35,33 @@ func GetMealByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"data": meal})
 	}
 }
+func GetMealByDateHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		date := c.Param("date")
+		db := appctx.GetMainDBConnection()
+		repo := mealrepositories.NewMealRepository(db)
+		mealInteractor := mealinteractors.NewMealInteractor(repo)
+		meal, _ := mealInteractor.GetMealByDate(id, date)
+		//if err != nil {
+		//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		//	return
+		//}
+		c.JSON(http.StatusOK, gin.H{"data": meal})
+	}
+}
+func GetInfomationCaloriesHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		date := c.Param("date")
+		db := appctx.GetMainDBConnection()
+		repo := mealrepositories.NewMealRepository(db)
+		mealInteractor := mealinteractors.NewMealInteractor(repo)
+		meal, schedule, calorie, nutrition, err := mealInteractor.GetInfomationCalories(id, date)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"schedule": schedule, "meal": meal, "calorie": calorie, "nutrition": nutrition})
+	}
+}

@@ -73,3 +73,10 @@ func (i *ScheduleInteractor) UpdateScheduleDetail(schedule *schedulemodels.Sched
 	}
 	return nil
 }
+func (i *ScheduleInteractor) GetScheduleBydate(id *string, date *string) (*schedulemodels.ScheduleGet, error) {
+	schedule, err := i.ScheduleRepository.GetScheduleByDate(id, date)
+	if err != nil {
+		return nil, err
+	}
+	return schedule, nil
+}

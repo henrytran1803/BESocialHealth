@@ -1,6 +1,9 @@
 package schedulerepositories
 
-import schedulemodels "BESocialHealth/Internal/personal_schedule_management/models"
+import (
+	schedulemodels "BESocialHealth/Internal/personal_schedule_management/models"
+	"gorm.io/gorm"
+)
 
 func (r *ScheduleRepository) GetListSchedule() ([]schedulemodels.ScheduleGet, error) {
 	var results []schedulemodels.ScheduleGet
@@ -120,4 +123,22 @@ func (r *ScheduleRepository) DeleteScheduleById(id string) error {
 		return err
 	}
 	return nil
+}
+func (r *ScheduleRepository) GetScheduleByDate(id *string, date *string) (*schedulemodels.ScheduleGet, error) {
+	var schedule schedulemodels.ScheduleGet
+
+	if err := r.DB.Table(schedulemodels.Schedule{}.TableName()).Where("DATE(created_at) = ? AND user_id = ?", date, id).First(&schedule).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	var schedule_details []schedulemodels.ScheduleDetail
+	if err := r.DB.Table(schedulemodels.ScheduleDetail{}.TableName()).Where("schedule_id = ?", schedule.Id).Find(&schedule_details).Error; err != nil {
+		return nil, err
+	}
+
+	schedule.Detail = schedule_details
+	return &schedule, nil
 }

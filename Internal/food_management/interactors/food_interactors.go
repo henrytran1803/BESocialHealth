@@ -26,13 +26,13 @@ func (i *FoodInteractor) GetFood(id string) (*foodmodels.Food, error) {
 }
 func (i *FoodInteractor) DeleteFood(id int) error {
 	err := i.FoodRepository.DeleteFoodById(strconv.Itoa(id))
+	if err := i.FoodRepository.DeletePhotoByFood(strconv.Itoa(id)); err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
 
-	if err := i.FoodRepository.DeletePhotoByFood(strconv.Itoa(id)); err != nil {
-		return err
-	}
 	return nil
 }
 func (i *FoodInteractor) CreateFood(food *foodmodels.Food, imageData []byte, fileName string) error {

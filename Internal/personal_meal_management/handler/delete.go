@@ -26,7 +26,7 @@ func DeleteDetailMealById(appctx appctx.AppContext) gin.HandlerFunc {
 		db := appctx.GetMainDBConnection()
 		repo := mealrepositories.NewMealRepository(db)
 		mealInteractor := mealinteractors.NewMealInteractor(repo)
-		if err := mealInteractor.DeleteMealById(id); err != nil {
+		if err := mealInteractor.DeleteMealDetail(id); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		c.JSON(http.StatusOK, gin.H{"data": id})

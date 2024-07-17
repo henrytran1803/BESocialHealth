@@ -68,7 +68,7 @@ func (r *ExersiceRepository) UpdateExersice(id int, exersice *exersicemodels.Exe
 
 func (r *ExersiceRepository) DeleteExersiceById(id int) error {
 	var exersice exersicemodels.Exersice
-	if err := r.DB.Where("id = ?", id).Delete(&exersice).Error; err != nil {
+	if err := r.DB.Table(exersicemodels.Exersice{}.TableName()).Where("id = ?", id).Delete(&exersice).Error; err != nil {
 		return err
 	}
 	return nil
@@ -95,7 +95,7 @@ func (r *ExersiceRepository) DeletePhotoById(id int) error {
 }
 
 func (r *ExersiceRepository) DeletePhotoByExersice(exerciseId int) error {
-	if err := r.DB.Table(exersicemodels.Photo{}.TableName()).Where("exercise_id = ?", exerciseId).Delete(&exersicemodels.Photo{}).Error; err != nil {
+	if err := r.DB.Table(exersicemodels.Photo{}.TableName()).Where("exersice_id = ?", exerciseId).Delete(&exersicemodels.Photo{}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -105,4 +105,11 @@ func (r *ExersiceRepository) UpdateExersiceNonePhoto(exersice *exersicemodels.Ex
 		return err
 	}
 	return nil
+}
+func (r *ExersiceRepository) GetAllExtype() (*[]exersicemodels.Exersice_type, error) {
+	var exersice []exersicemodels.Exersice_type
+	if err := r.DB.Table(exersicemodels.Exersice_type{}.TableName()).Find(&exersice).Error; err != nil {
+		return nil, err
+	}
+	return &exersice, nil
 }

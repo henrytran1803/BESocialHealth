@@ -31,7 +31,7 @@ func (i *UserInteractor) GetAllUsers() (*[]usermodels.User, error) {
 	}
 	return users, nil
 }
-func (i *UserInteractor) UpdateUser(user *usermodels.UserDetail) error {
+func (i *UserInteractor) UpdateUser(user *usermodels.User) error {
 	if user == nil {
 		return errors.New("user is nil")
 	}

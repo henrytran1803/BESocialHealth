@@ -29,3 +29,16 @@ func GetExersiceByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 	}
 }
+func GetAllExTypeHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := appctx.GetMainDBConnection()
+		exersiceRepo := exersicerepositories.NewExersiceRepository(db)
+		exersiceInteractor := interactors.NewExersiceInteractor(exersiceRepo)
+		exersice, err := exersiceInteractor.GetAllExType()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		}
+		c.JSON(http.StatusOK, exersice)
+
+	}
+}
