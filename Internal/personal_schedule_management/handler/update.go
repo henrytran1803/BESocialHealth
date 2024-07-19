@@ -31,13 +31,13 @@ func UpdateScheduleDetailHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		repo := schedulerepositories.NewScheduleRepository(db)
 		scheduleInteractor := scheduleinteractors.NewScheduleInteractor(repo)
 
-		var schedule schedulemodels.ScheduleDetailCreate
+		var schedule schedulemodels.ScheduleDetail
 		if err := c.ShouldBindJSON(&schedule); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 		if err := scheduleInteractor.UpdateScheduleDetail(&schedule); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"message": "Scheduledetail updated"})
+		c.JSON(http.StatusOK, gin.H{"message": "Scheduledetail updated"})
 	}
 }

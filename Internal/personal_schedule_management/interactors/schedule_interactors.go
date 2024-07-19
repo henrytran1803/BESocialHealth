@@ -15,11 +15,12 @@ func NewScheduleInteractor(repo *schedulerepositories.ScheduleRepository) *Sched
 	}
 }
 
-func (i *ScheduleInteractor) CreateSchedule(schedule *schedulemodels.ScheduleCreateFull) error {
-	if err := i.ScheduleRepository.CreateSchedule(schedule); err != nil {
-		return err
+func (i *ScheduleInteractor) CreateSchedule(schedule *schedulemodels.ScheduleCreateFullOnly) (*int, error) {
+	id, err := i.ScheduleRepository.CreateSchedule(schedule)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return id, nil
 }
 func (i *ScheduleInteractor) CreateScheduleDetail(schedule *schedulemodels.ScheduleDetailCreate) error {
 	if err := i.ScheduleRepository.CreateScheduleDetail(schedule); err != nil {
@@ -67,7 +68,7 @@ func (i *ScheduleInteractor) UpdateSchedule(schedule *schedulemodels.ScheduleCre
 	}
 	return nil
 }
-func (i *ScheduleInteractor) UpdateScheduleDetail(schedule *schedulemodels.ScheduleDetailCreate) error {
+func (i *ScheduleInteractor) UpdateScheduleDetail(schedule *schedulemodels.ScheduleDetail) error {
 	if err := i.ScheduleRepository.UpdateScheduleDetail(schedule); err != nil {
 		return err
 	}
@@ -79,4 +80,18 @@ func (i *ScheduleInteractor) GetScheduleBydate(id *string, date *string) (*sched
 		return nil, err
 	}
 	return schedule, nil
+}
+func (i *ScheduleInteractor) GetScheduleDateToDate(fromdate, date *string, id *string) ([]schedulemodels.ScheduleGet, error) {
+	schedules, err := i.ScheduleRepository.GetScheduleDateToDate(fromdate, date, id)
+	if err != nil {
+		return nil, err
+	}
+	return schedules, nil
+}
+func (i *ScheduleInteractor) GetListScheduleByUserId(userId string) ([]schedulemodels.ScheduleGet, error) {
+	schedules, err := i.ScheduleRepository.GetListScheduleByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	return schedules, nil
 }

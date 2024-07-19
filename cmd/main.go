@@ -132,11 +132,13 @@ func main() {
 	schedule.POST("/detail", schedulehandler.CreateScheduleDetailHandler(appctx))
 	schedule.GET("", schedulehandler.GetAllScheduleHandler(appctx))
 	schedule.GET("/:id", schedulehandler.GetScheduleByIdHandler(appctx))
+	schedule.GET("/user/:id", schedulehandler.GetScheduleByUserIdHandler(appctx))
 	schedule.PUT("", schedulehandler.UpdateScheduleHandler(appctx))
 	schedule.PUT("/detail", schedulehandler.UpdateScheduleDetailHandler(appctx))
 	schedule.DELETE("/:id", schedulehandler.DeleteScheduleHandler(appctx))
 	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
 	schedule.GET("/user/:id/date/:date", schedulehandler.GetScheduleByDateHandler(appctx))
+	schedule.GET("/user/:id/fromdate/:fromdate/date/:date", schedulehandler.GetScheduleDateToDateHandler(appctx))
 	// message
 	message := v1.Group("/conversation")
 	message.Use(middleware.AuthMiddleware(appctx))

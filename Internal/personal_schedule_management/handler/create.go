@@ -15,14 +15,15 @@ func CreateScheduleHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		repo := schedulerepositories.NewScheduleRepository(db)
 		scheduleInteractor := scheduleinteractors.NewScheduleInteractor(repo)
 
-		var schedule schedulemodels.ScheduleCreateFull
+		var schedule schedulemodels.ScheduleCreateFullOnly
 		if err := c.ShouldBindJSON(&schedule); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		if err := scheduleInteractor.CreateSchedule(&schedule); err != nil {
+		id, err := scheduleInteractor.CreateSchedule(&schedule)
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"schedule": schedule})
+		c.JSON(http.StatusOK, gin.H{"id": id})
 	}
 }
 func CreateScheduleDetailHandler(appctx appctx.AppContext) gin.HandlerFunc {
