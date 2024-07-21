@@ -1,5 +1,7 @@
 package personalcontentmodels
 
+import usermodels "BESocialHealth/Internal/user_management/models"
+
 type Post struct {
 	Id     int    `json:"id" gorm:"column:id"`
 	Title  string `json:"title" gorm:"column:title"`
@@ -23,6 +25,7 @@ type Photo struct {
 	Image      []byte `json:"image" gorm:"column:image"`
 	Url        string `json:"url" gorm:"column:url"`
 	Post_id    string `json:"post_id" gorm:"column:post_id"`
+	Comment_id string `json:"comment_id" gorm:"column:comment_id"`
 }
 
 func (Like) TableName() string    { return "likes" }
@@ -50,9 +53,9 @@ type CreatePhoto struct {
 	Comment_id *string `json:"comment_id" gorm:"column:comment_id"`
 }
 type CreateCommentFull struct {
-	Body        string      `json:"body" gorm:"column:body"`
-	UserId      int64       `json:"user_id" gorm:"column:user_id"`
-	PostId      int64       `json:"post_id" gorm:"column:post_id"`
+	Body        string      `json:"body" gorm:"column:body" form:"body"`
+	UserId      int64       `json:"user_id" gorm:"column:user_id" form:"user_id"`
+	PostId      int64       `json:"post_id" gorm:"column:post_id" form:"post_id"`
 	CreatePhoto CreatePhoto `json:"photos"`
 }
 type CreateComment struct {
@@ -67,18 +70,19 @@ type CreateLike struct {
 	PostId int64 `json:"post_id" gorm:"column:post_id"`
 }
 type GetPost struct {
-	ID             int     `json:"id" gorm:"column:id"`
-	Title          string  `json:"title" gorm:"column:title"`
-	Body           string  `json:"body" gorm:"column:body"`
-	UserId         int64   `json:"user_id" gorm:"column:user_id"`
-	Photos         []Photo `json:"photos"`
-	Count_likes    int     `json:"count_likes" `
-	Count_comments int     `json:"count_comments" `
+	ID             int                   `json:"id" gorm:"column:id"`
+	Title          string                `json:"title" gorm:"column:title"`
+	Body           string                `json:"body" gorm:"column:body"`
+	UserId         int64                 `json:"user_id" gorm:"column:user_id"`
+	User           *usermodels.UserPhoto `json:"user"`
+	Photos         []Photo               `json:"photos"`
+	Count_likes    int                   `json:"count_likes" `
+	Count_comments int                   `json:"count_comments" `
 }
 type GetComment struct {
-	ID     int    `json:"id" gorm:"column:id"`
-	Body   string `json:"body" gorm:"column:body"`
-	UserId int64  `json:"user_id" gorm:"column:user_id"`
-	Name   string `json:"name" `
-	Photo  Photo  `json:"photos"`
+	ID     int                   `json:"id" gorm:"column:id"`
+	Body   string                `json:"body" gorm:"column:body"`
+	UserId int64                 `json:"user_id" gorm:"column:user_id"`
+	User   *usermodels.UserPhoto `json:"user"`
+	Photo  *Photo                `json:"photos"`
 }

@@ -20,8 +20,8 @@ func (i *PersonalContentInteractor) CreatePost(post *personalcontentmodels.Creat
 	}
 	return nil
 }
-func (i *PersonalContentInteractor) UpdatePostById(id int, post *personalcontentmodels.CreatePost) error {
-	if err := i.PersonalContentRepository.UpdatePostById(id, post); err != nil {
+func (i *PersonalContentInteractor) UpdatePostById(post *personalcontentmodels.CreatePost) error {
+	if err := i.PersonalContentRepository.UpdatePostById(post); err != nil {
 		return err
 	}
 	return nil
@@ -72,4 +72,19 @@ func (i *PersonalContentInteractor) GetAllPost() (*[]personalcontentmodels.GetPo
 		return nil, err
 	}
 	return &posts, nil
+}
+
+func (i *PersonalContentInteractor) CheckIsLike(postId string, userId string) (bool, error) {
+	isTrue, err := i.PersonalContentRepository.CheckIsLike(postId, userId)
+	if err != nil {
+		return false, err
+	}
+	return isTrue, nil
+}
+func (i *PersonalContentInteractor) CreateCommentNonePhoto(comment *personalcontentmodels.CreateComment) (int, error) {
+	isTrue, err := i.PersonalContentRepository.CreateComment(comment)
+	if err != nil {
+		return 0, err
+	}
+	return isTrue, nil
 }

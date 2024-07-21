@@ -26,7 +26,6 @@ func GetUserByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 		}
 		c.JSON(http.StatusOK, gin.H{"data": user})
-
 	}
 }
 func GetAllUserHandler(appctx appctx.AppContext) gin.HandlerFunc {

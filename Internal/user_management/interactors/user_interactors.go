@@ -16,7 +16,7 @@ func NewUserInteractor(repo *userrepositories.UserRepository) *UserInteractor {
 	}
 }
 
-func (i *UserInteractor) GetUserById(id int) (*usermodels.User, error) {
+func (i *UserInteractor) GetUserById(id int) (*usermodels.UserPhoto, error) {
 	user, err := i.UserRepository.GetUserById(id)
 	if err != nil {
 		return nil, err

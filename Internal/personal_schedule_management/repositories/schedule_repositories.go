@@ -158,8 +158,8 @@ func (r *ScheduleRepository) GetScheduleByDate(id *string, date *string) (*sched
 	return &schedule, nil
 }
 func (r *ScheduleRepository) GetScheduleDateToDate(fromdate, date *string, id *string) ([]schedulemodels.ScheduleGet, error) {
-	var schedules []schedulemodels.ScheduleGet
-
+	var results []schedulemodels.ScheduleGet
+	var schedules []schedulemodels.Schedule
 	if err := r.DB.Table(schedulemodels.Schedule{}.TableName()).
 		Where("DATE(created_at) BETWEEN ? AND ? AND user_id = ?", fromdate, date, id).
 		Find(&schedules).Error; err != nil {
@@ -168,8 +168,22 @@ func (r *ScheduleRepository) GetScheduleDateToDate(fromdate, date *string, id *s
 		}
 		return nil, err
 	}
+	for _, schedule := range schedules {
+		var details []schedulemodels.ScheduleDetail
+		if err := r.DB.Table(schedulemodels.ScheduleDetail{}.TableName()).Where("schedule_id = ?", schedule.Id).Find(&details).Error; err != nil {
+			return nil, err
+		}
+		result := schedulemodels.ScheduleGet{
+			User_id: schedule.User_id,
+			Time:    schedule.Time,
+			Id:      schedule.Id,
+			Detail:  details,
+		}
+		results = append(results, result)
+	}
 
-	return schedules, nil
+	return results, nil
+
 }
 func (r *ScheduleRepository) GetListScheduleByUserId(userId string) ([]schedulemodels.ScheduleGet, error) {
 	var results []schedulemodels.ScheduleGet

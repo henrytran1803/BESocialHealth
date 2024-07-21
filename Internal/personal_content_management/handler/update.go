@@ -7,16 +7,10 @@ import (
 	"BESocialHealth/component/appctx"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 func UpdatePostHandler(appctx appctx.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("id")
-		postId, err := strconv.Atoi(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		}
 		db := appctx.GetMainDBConnection()
 		repo := personalcontentrepositories.NewPersonalContentRepository(db)
 		postInteractor := personalcontentinteractors.NewPersonalContentInteractor(repo)
@@ -26,7 +20,7 @@ func UpdatePostHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&post); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		postInteractor.UpdatePostById(postId, &post)
-		c.JSON(http.StatusCreated, gin.H{"Data": post})
+		postInteractor.UpdatePostById(&post)
+		c.JSON(http.StatusOK, gin.H{"Data": post})
 	}
 }

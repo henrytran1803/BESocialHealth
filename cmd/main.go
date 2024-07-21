@@ -118,13 +118,16 @@ func main() {
 	content.Use(middleware.AuthMiddleware(appctx))
 	content.POST("", personalcontenthandler.CreatePostHandler(appctx))
 	content.POST("/like", personalcontenthandler.LikeHandler(appctx))
+	content.POST("/comment", personalcontenthandler.CreateCommentwithimageHandler(appctx))
+	content.POST("/commentnonephoto", personalcontenthandler.CreateCommentNoneHandler(appctx))
 	content.DELETE("/like", personalcontenthandler.DeleteLikeByUserIdAndPostIdHandler(appctx))
 	content.DELETE("/:id", personalcontenthandler.DeletePostHandler(appctx))
-	content.POST("/coment", personalcontenthandler.CreatePostHandler(appctx))
-	content.PUT("/:id", personalcontenthandler.UpdatePostHandler(appctx))
+	content.PUT("", personalcontenthandler.UpdatePostHandler(appctx))
 	content.GET("/:id", personalcontenthandler.GetPostByIdHandler(appctx))
 	content.GET("", personalcontenthandler.GetAllPostHandler(appctx))
 	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
+	content.GET("/islike/user/:id/post/:postid", personalcontenthandler.CheckIsLikeByUserIdAndPosstIdHandler(appctx))
+
 	// schedule
 	schedule := v1.Group("/schedule")
 	schedule.Use(middleware.AuthMiddleware(appctx))
@@ -139,6 +142,7 @@ func main() {
 	schedule.DELETE("/detail/:id", schedulehandler.DeleteScheduleDetailHandler(appctx))
 	schedule.GET("/user/:id/date/:date", schedulehandler.GetScheduleByDateHandler(appctx))
 	schedule.GET("/user/:id/fromdate/:fromdate/date/:date", schedulehandler.GetScheduleDateToDateHandler(appctx))
+
 	// message
 	message := v1.Group("/conversation")
 	message.Use(middleware.AuthMiddleware(appctx))

@@ -62,3 +62,19 @@ func GetAllComentByPostIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 	}
 }
+func CheckIsLikeByUserIdAndPosstIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		postID := c.Param("postid")
+		db := appctx.GetMainDBConnection()
+		repo := personalcontentrepositories.NewPersonalContentRepository(db)
+		postInteractor := personalcontentinteractors.NewPersonalContentInteractor(repo)
+
+		comments, err := postInteractor.CheckIsLike(postID, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"data": comments})
+
+	}
+}

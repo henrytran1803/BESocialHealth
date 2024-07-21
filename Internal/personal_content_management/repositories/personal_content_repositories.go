@@ -2,6 +2,9 @@ package personalcontentrepositories
 
 import (
 	personalcontentmodels "BESocialHealth/Internal/personal_content_management/models"
+	userrepositories "BESocialHealth/Internal/user_management/repositories"
+	"errors"
+	"gorm.io/gorm"
 	"strconv"
 )
 
@@ -14,8 +17,8 @@ func (r *PersonalContentRepository) CreatePost(post *personalcontentmodels.Creat
 func (r *PersonalContentRepository) CreatePhoto(photo *personalcontentmodels.CreatePhoto) error {
 	return r.DB.Table(personalcontentmodels.Photo{}.TableName()).Create(photo).Error
 }
-func (r *PersonalContentRepository) UpdatePostById(id int, post *personalcontentmodels.CreatePost) error {
-	return r.DB.Table(personalcontentmodels.Post{}.TableName()).Where("id = ?", id).Updates(post).Error
+func (r *PersonalContentRepository) UpdatePostById(post *personalcontentmodels.CreatePost) error {
+	return r.DB.Table(personalcontentmodels.Post{}.TableName()).Where("id = ?", post.ID).Updates(post).Error
 }
 
 func (r *PersonalContentRepository) CreateFullPost(post *personalcontentmodels.CreatePostFull) error {
@@ -86,25 +89,54 @@ func (r *PersonalContentRepository) DeleteCommentByUserIDAndPostId(userId string
 	}
 	return nil
 }
-func (r *PersonalContentRepository) DeletePostById(postId int) error {
-	if err := r.DeletePhotoByPostId(postId); err != nil {
-		return err
-	}
-	if err := r.DB.Table(personalcontentmodels.Post{}.TableName()).Where("id = ?", postId).Delete(&personalcontentmodels.Post{}).Error; err != nil {
+
+func (r *PersonalContentRepository) DeleteCommentByPostId(postId int) error {
+	if err := r.DB.Table(personalcontentmodels.Comment{}.TableName()).
+		Where("post_id = ?", postId).
+		Delete(&personalcontentmodels.Comment{}).Error; err != nil {
 		return err
 	}
 	return nil
 }
+func (r *PersonalContentRepository) DeletePostById(postId int) error {
+	if err := r.DeletePhotosByPostId(postId); err != nil {
+		return err
+	}
+	if err := r.DB.Table(personalcontentmodels.Like{}.TableName()).Where("post_id = ?", postId).Delete(&personalcontentmodels.Like{}).Error; err != nil {
+		return err
+	}
+	if err := r.DeleteCommentByPostId(postId); err != nil {
+		return err
+	}
+
+	if err := r.DB.Table(personalcontentmodels.Post{}.TableName()).Where("id = ?", postId).Delete(&personalcontentmodels.Post{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *PersonalContentRepository) DeletePhotoById(photoId int) error {
 	if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).Where("id = ?", photoId).Delete(&personalcontentmodels.Photo{}).Error; err != nil {
 		return err
 	}
 	return nil
 }
-func (r *PersonalContentRepository) DeletePhotoByPostId(postId int) error {
-	if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).Where("post_id = ?", postId).Delete(&personalcontentmodels.Photo{}).Error; err != nil {
+func (r *PersonalContentRepository) DeletePhotosByPostId(postId int) error {
+	// Xóa các ảnh liên quan đến bình luận
+	if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).
+		Where("comment_id IN (SELECT id FROM comments WHERE post_id = ?)", postId).
+		Delete(&personalcontentmodels.Photo{}).Error; err != nil {
 		return err
 	}
+
+	// Xóa các ảnh không liên kết với bất kỳ bình luận nào
+	if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).
+		Where("post_id = ?", postId).
+		Delete(&personalcontentmodels.Photo{}).Error; err != nil {
+		return err
+	}
+
 	return nil
 }
 func (r *PersonalContentRepository) DeletePhotoByCommentId(postId int) error {
@@ -122,21 +154,26 @@ func (r *PersonalContentRepository) GetAllCommentByPostId(postId int) ([]persona
 	}
 
 	for _, comment := range comments {
-		var user struct {
-			Name string `gorm:"column:name"`
+
+		var photo *personalcontentmodels.Photo
+		if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).Where("comment_id = ?", comment.Id).First(&photo).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				photo = nil
+			} else {
+				return nil, err
+			}
 		}
-		if err := r.DB.Table("users").Where("id = ?", comment.UserId).Select("name").First(&user).Error; err != nil {
-			return nil, err
-		}
-		var photo personalcontentmodels.Photo
-		if err := r.DB.Table(personalcontentmodels.Photo{}.TableName()).Where("post_id = ?", postId).First(&photo).Error; err != nil {
+
+		userRepo := userrepositories.NewUserRepository(r.DB)
+		userInfo, err := userRepo.GetUserById(int(comment.UserId))
+		if err != nil {
 			return nil, err
 		}
 		commentsFull = append(commentsFull, personalcontentmodels.GetComment{
 			ID:     postId,
 			Body:   comment.Body,
 			UserId: comment.UserId,
-			Name:   user.Name,
+			User:   userInfo,
 			Photo:  photo,
 		})
 	}
@@ -171,7 +208,11 @@ func (r *PersonalContentRepository) GetPostById(postId int) (personalcontentmode
 	if err := r.DB.Table(personalcontentmodels.Comment{}.TableName()).Where("post_id = ?", postId).Count(&countComments).Error; err != nil {
 		return personalcontentmodels.GetPost{}, err
 	}
-
+	userRepo := userrepositories.NewUserRepository(r.DB)
+	user, err := userRepo.GetUserById(int(post.UserId))
+	if err != nil {
+		return personalcontentmodels.GetPost{}, err
+	}
 	getPost := personalcontentmodels.GetPost{
 		ID:             postId,
 		Title:          post.Title,
@@ -180,6 +221,7 @@ func (r *PersonalContentRepository) GetPostById(postId int) (personalcontentmode
 		Photos:         photos,
 		Count_likes:    int(countLikes),
 		Count_comments: int(countComments),
+		User:           user,
 	}
 
 	return getPost, nil
@@ -206,7 +248,8 @@ func (r *PersonalContentRepository) GetAllPosts() ([]personalcontentmodels.GetPo
 		if err := r.DB.Table(personalcontentmodels.Comment{}.TableName()).Where("post_id = ?", post.Id).Count(&countComments).Error; err != nil {
 			return nil, err
 		}
-
+		userRepo := userrepositories.NewUserRepository(r.DB)
+		user, err := userRepo.GetUserById(int(post.UserId))
 		getPosts = append(getPosts, personalcontentmodels.GetPost{
 			ID:             post.Id,
 			Title:          post.Title,
@@ -215,8 +258,18 @@ func (r *PersonalContentRepository) GetAllPosts() ([]personalcontentmodels.GetPo
 			Photos:         photos,
 			Count_likes:    int(countLikes),
 			Count_comments: int(countComments),
+			User:           user,
 		})
 	}
-
 	return getPosts, nil
+}
+
+func (r *PersonalContentRepository) CheckIsLike(postID string, userID string) (bool, error) {
+	var count int64
+	if err := r.DB.Table(personalcontentmodels.Like{}.TableName()).
+		Where("post_id = ? AND user_id = ?", postID, userID).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
