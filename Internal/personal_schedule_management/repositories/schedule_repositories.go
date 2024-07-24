@@ -142,7 +142,7 @@ func (r *ScheduleRepository) DeleteScheduleById(id string) error {
 func (r *ScheduleRepository) GetScheduleByDate(id *string, date *string) (*schedulemodels.ScheduleGet, error) {
 	var schedule schedulemodels.ScheduleGet
 
-	if err := r.DB.Table(schedulemodels.Schedule{}.TableName()).Where("DATE(created_at) = ? AND user_id = ?", date, id).First(&schedule).Error; err != nil {
+	if err := r.DB.Table(schedulemodels.Schedule{}.TableName()).Where("DATE(time) = ? AND user_id = ?", date, id).First(&schedule).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}

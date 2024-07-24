@@ -23,7 +23,7 @@ func (i *UserInteractor) GetUserById(id int) (*usermodels.UserPhoto, error) {
 	}
 	return user, nil
 }
-func (i *UserInteractor) GetAllUsers() (*[]usermodels.User, error) {
+func (i *UserInteractor) GetAllUsers() (*[]usermodels.UserPhoto, error) {
 	users, err := i.UserRepository.GetAllUser()
 	if err != nil {
 

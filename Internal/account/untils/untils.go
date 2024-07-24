@@ -16,10 +16,15 @@ func SendPasswordResetEmail(email string, token string) error {
 	m.SetHeader("To", email)
 	m.SetHeader("Subject", "Password Reset Request")
 	resetLink := fmt.Sprintf("https://localhost:8080/reset-password?token=%s", token)
-	m.SetBody("text/html", fmt.Sprintf("Click <a href=\"%s\">here</a> to reset your password.", resetLink))
+	body := fmt.Sprintf(
+		`Click <a href="%s">here</a> to reset your password.<br><br>
+         If you prefer, you can copy and paste this token into the password reset page: <b>%s</b>`,
+		resetLink, token,
+	)
+	m.SetBody("text/html", body)
 
 	d := gomail.NewDialer("smtp.gmail.com", 587, "tranvietanh1803@gmail.com", "teln hzlw dtgc bvyv")
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true} // Chỉ sử dụng cho thử nghiệm
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
 		return err

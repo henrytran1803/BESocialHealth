@@ -38,7 +38,6 @@ func LoginHandler(appctx appctx.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		// Generate a new secret for the user and update the database
 		user.JWTSecret = accountuntils.GenerateRandomString(32)
 		if err := db.Save(user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError,

@@ -2,6 +2,8 @@ package messagerepositories
 
 import (
 	messagemodels "BESocialHealth/Internal/messaging/models"
+	usermodels "BESocialHealth/Internal/user_management/models"
+	userrepositories "BESocialHealth/Internal/user_management/repositories"
 	"time"
 )
 
@@ -19,10 +21,31 @@ func (r *MessageRepository) CreateMessage(conversationID, senderID int, content 
 	return message.ID, nil
 }
 
-func (r *MessageRepository) GetConversationMessages(conversationID int) ([]messagemodels.Message, error) {
+func (r *MessageRepository) GetConversationMessages(conversationID int) (*messagemodels.GetMessageConvertion, error) {
 	var messages []messagemodels.Message
-	err := r.DB.Where("conversation_id = ?", conversationID).Find(&messages).Error
-	return messages, err
+	if err := r.DB.Where("conversation_id = ?", conversationID).Order("timestamp ASC").Find(&messages).Error; err != nil {
+		return nil, err
+	}
+
+	userIDs := make(map[int]bool)
+	for _, msg := range messages {
+		userIDs[msg.SenderID] = true
+	}
+	userRepo := userrepositories.NewUserRepository(r.DB)
+
+	var users []usermodels.UserPhoto
+	for userID := range userIDs {
+		user, err := userRepo.GetUserById(userID)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, *user)
+	}
+
+	return &messagemodels.GetMessageConvertion{
+		Users:    users,
+		Messages: messages,
+	}, nil
 }
 func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Conversation, error) {
 	var conversations []messagemodels.Conversation
@@ -40,7 +63,9 @@ func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Co
 	}
 	defer rows.Close()
 
+	userRepo := userrepositories.NewUserRepository(r.DB)
 	conversationMap := make(map[int]*messagemodels.Conversation)
+
 	for rows.Next() {
 		var conversationID int
 		var createdAt time.Time
@@ -63,6 +88,18 @@ func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Co
 	}
 
 	for _, conversation := range conversationMap {
+		var users []usermodels.UserPhoto
+		for _, participantID := range conversation.Participants {
+			user, err := userRepo.GetUserById(participantID)
+			if err != nil {
+				return nil, err
+			}
+			users = append(users, *user)
+		}
+		conversation.Users = users
+	}
+
+	for _, conversation := range conversationMap {
 		conversations = append(conversations, *conversation)
 	}
 
@@ -70,8 +107,8 @@ func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Co
 }
 
 func (r *MessageRepository) CreateConversation(participants []int) (int, error) {
-	conversation := messagemodels.Conversation{}
-	if err := r.DB.Create(&conversation).Error; err != nil {
+	conversation := messagemodels.ConversationCreate{}
+	if err := r.DB.Table("conversations").Create(&conversation).Error; err != nil {
 		return 0, err
 	}
 

@@ -29,7 +29,7 @@ func UpdateUserHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 		log.Printf("UserUpdate(id: %d, email: %s, firstname: %s, lastname: %s, role: %d, height: %f, weight: %f, bdf: %f, tdee: %f, calorie: %f, status: %d)",
 			user.Id, user.Email, user.FirstName, user.LastName, user.Role, user.Height, user.Weight, user.BDF, user.TDEE, user.Calorie, user.Status)
-
+		user.Role = 1
 		if err := userInteractor.UpdateUser(&user); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 			return

@@ -73,7 +73,13 @@ func (i *PersonalContentInteractor) GetAllPost() (*[]personalcontentmodels.GetPo
 	}
 	return &posts, nil
 }
-
+func (i *PersonalContentInteractor) GetAllPostById(id string) (*[]personalcontentmodels.GetPost, error) {
+	posts, err := i.PersonalContentRepository.GetAllPostsByUserId(id)
+	if err != nil {
+		return nil, err
+	}
+	return &posts, nil
+}
 func (i *PersonalContentInteractor) CheckIsLike(postId string, userId string) (bool, error) {
 	isTrue, err := i.PersonalContentRepository.CheckIsLike(postId, userId)
 	if err != nil {

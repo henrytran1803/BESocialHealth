@@ -27,6 +27,7 @@ func (r *UserRepository) GetUserById(id int) (*usermodels.UserPhoto, error) {
 	userPhoto.Id = user.Id
 	userPhoto.Email = user.Email
 	userPhoto.FirstName = user.FirstName
+	userPhoto.LastName = user.LastName
 	userPhoto.Height = user.Height
 	userPhoto.Weight = user.Weight
 	userPhoto.BDF = user.BDF
@@ -37,13 +38,45 @@ func (r *UserRepository) GetUserById(id int) (*usermodels.UserPhoto, error) {
 	return &userPhoto, nil
 }
 
-func (r *UserRepository) GetAllUser() (*[]usermodels.User, error) {
-
+func (r *UserRepository) GetAllUser() (*[]usermodels.UserPhoto, error) {
 	var users []usermodels.User
+	var userPhotos []usermodels.UserPhoto
+
+	// Lấy tất cả người dùng
 	if err := r.DB.Table(usermodels.User{}.TableName()).Find(&users).Error; err != nil {
 		return nil, err
 	}
-	return &users, nil
+
+	// Duyệt qua tất cả người dùng để lấy ảnh
+	for _, user := range users {
+		var photo usermodels.Photo
+		userPhoto := usermodels.UserPhoto{
+			Id:        user.Id,
+			Email:     user.Email,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Height:    user.Height,
+			Weight:    user.Weight,
+			BDF:       user.BDF,
+			TDEE:      user.TDEE,
+			Calorie:   user.Calorie,
+			Status:    user.Status,
+		}
+
+		if err := r.DB.Table("photos").Where("user_id = ?", user.Id).First(&photo).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				userPhoto.Photo = nil
+			} else {
+				return nil, err
+			}
+		} else {
+			userPhoto.Photo = &photo
+		}
+
+		userPhotos = append(userPhotos, userPhoto)
+	}
+
+	return &userPhotos, nil
 }
 
 func (r *UserRepository) UpdateUser(user *usermodels.User) error {

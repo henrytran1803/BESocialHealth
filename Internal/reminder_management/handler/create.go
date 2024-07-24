@@ -16,12 +16,14 @@ func CreateReminderHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		reminderInteractor := reminderinteractors.NewReminderInteractor(repo)
 
 		var reminder remindermodels.ReminderCreate
+
 		if err := c.ShouldBindJSON(&reminder); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
+		reminder.Status = "0"
 		if err := reminderInteractor.CreateReminder(&reminder); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"data": reminder})
+		c.JSON(http.StatusOK, gin.H{"data": reminder})
 	}
 }

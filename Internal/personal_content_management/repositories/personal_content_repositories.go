@@ -263,7 +263,43 @@ func (r *PersonalContentRepository) GetAllPosts() ([]personalcontentmodels.GetPo
 	}
 	return getPosts, nil
 }
+func (r *PersonalContentRepository) GetAllPostsByUserId(id string) ([]personalcontentmodels.GetPost, error) {
+	var posts []personalcontentmodels.Post
+	if err := r.DB.Table(personalcontentmodels.Post{}.TableName()).Order("created_at asc").Where("user_id = ?", id).Find(&posts).Error; err != nil {
+		return nil, err
+	}
 
+	var getPosts []personalcontentmodels.GetPost
+	for _, post := range posts {
+		photos, err := r.GetPhotosByPostId(int(post.Id))
+		if err != nil {
+			return nil, err
+		}
+
+		var countLikes int64
+		if err := r.DB.Table(personalcontentmodels.Like{}.TableName()).Where("post_id = ?", post.Id).Count(&countLikes).Error; err != nil {
+			return nil, err
+		}
+
+		var countComments int64
+		if err := r.DB.Table(personalcontentmodels.Comment{}.TableName()).Where("post_id = ?", post.Id).Count(&countComments).Error; err != nil {
+			return nil, err
+		}
+		userRepo := userrepositories.NewUserRepository(r.DB)
+		user, err := userRepo.GetUserById(int(post.UserId))
+		getPosts = append(getPosts, personalcontentmodels.GetPost{
+			ID:             post.Id,
+			Title:          post.Title,
+			Body:           post.Body,
+			UserId:         post.UserId,
+			Photos:         photos,
+			Count_likes:    int(countLikes),
+			Count_comments: int(countComments),
+			User:           user,
+		})
+	}
+	return getPosts, nil
+}
 func (r *PersonalContentRepository) CheckIsLike(postID string, userID string) (bool, error) {
 	var count int64
 	if err := r.DB.Table(personalcontentmodels.Like{}.TableName()).

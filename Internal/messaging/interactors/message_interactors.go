@@ -26,6 +26,6 @@ func (mi *MessageInteractor) GetUserConversations(userID int) ([]messagemodels.C
 	return mi.MessageRepository.GetUserConversations(userID)
 }
 
-func (mi *MessageInteractor) GetConversationMessages(conversationID int) ([]messagemodels.Message, error) {
+func (mi *MessageInteractor) GetConversationMessages(conversationID int) (*messagemodels.GetMessageConvertion, error) {
 	return mi.MessageRepository.GetConversationMessages(conversationID)
 }

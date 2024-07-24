@@ -28,6 +28,22 @@ func GetPostByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 
 	}
 }
+func GetAllPostByIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		db := appctx.GetMainDBConnection()
+		repo := personalcontentrepositories.NewPersonalContentRepository(db)
+		postInteractor := personalcontentinteractors.NewPersonalContentInteractor(repo)
+
+		posts, err := postInteractor.GetAllPostById(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, gin.H{"data": posts})
+
+	}
+}
+
 func GetAllPostHandler(appctx appctx.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

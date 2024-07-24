@@ -79,7 +79,7 @@ func (r *AccountRepository) CreateAccount(user *accountmodels.CreateAccount) err
 }
 func (r *AccountRepository) Login(username string, password string) (*accountmodels.User, error) {
 	var user accountmodels.User
-	if err := r.DB.Table(accountmodels.User{}.TableName()).Where("email = ?", username).First(&user).Error; err != nil {
+	if err := r.DB.Table(accountmodels.User{}.TableName()).Where("email = ? and status = ?", username, 0).First(&user).Error; err != nil {
 		return nil, err
 	}
 	var account accountmodels.Account

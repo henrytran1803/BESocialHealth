@@ -124,6 +124,7 @@ func main() {
 	content.DELETE("/:id", personalcontenthandler.DeletePostHandler(appctx))
 	content.PUT("", personalcontenthandler.UpdatePostHandler(appctx))
 	content.GET("/:id", personalcontenthandler.GetPostByIdHandler(appctx))
+	content.GET("/user/:id", personalcontenthandler.GetAllPostByIdHandler(appctx))
 	content.GET("", personalcontenthandler.GetAllPostHandler(appctx))
 	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
 	content.GET("/islike/user/:id/post/:postid", personalcontenthandler.CheckIsLikeByUserIdAndPosstIdHandler(appctx))
@@ -159,7 +160,7 @@ func main() {
 	reminder.PUT("", reminderhandler.UpdateReminderHandler(appctx))
 	reminder.GET("/:id", reminderhandler.GetReminderByIdHandler(appctx))
 	reminder.DELETE("/:id", reminderhandler.DeleteReminderByIdHandler(appctx))
-	reminder.GET("/user/:id", reminderhandler.GetReminderByIdHandler(appctx))
+	reminder.GET("/user/:id", reminderhandler.GetReminderByIdUserHandler(appctx))
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)

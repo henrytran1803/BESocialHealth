@@ -44,6 +44,9 @@ func ListUserConversationsHandler(appctx appctx.AppContext) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		if conversations == nil {
+			conversations = []messagemodels.Conversation{}
+		}
 		c.JSON(http.StatusOK, conversations)
 	}
 }

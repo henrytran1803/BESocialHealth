@@ -1,7 +1,7 @@
 package ws
 
 import (
-	accountmodels "BESocialHealth/Internal/account/models"
+	"BESocialHealth/Internal/account/models"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -66,7 +66,7 @@ func (wm *WebSocketManager) SendToUser(userID, message string) {
 
 func (wm *WebSocketManager) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader := websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool { return true },
+		CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins (for testing)
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -108,10 +108,10 @@ func (wm *WebSocketManager) WebSocketHandler(w http.ResponseWriter, r *http.Requ
 
 func (wm *WebSocketManager) CheckUserActivity() {
 	for {
-		time.Sleep(30 * time.Second) // Kiểm tra mỗi 30 giây
+		time.Sleep(30 * time.Second) // Check every 30 seconds
 		wm.mu.Lock()
 		for userID, lastActive := range wm.lastActivity {
-			if time.Since(lastActive) > 1*time.Minute { // Nếu không hoạt động trong hơn 1 phút
+			if time.Since(lastActive) > 1*time.Minute { // If inactive for more than 1 minute
 				conn := wm.clients[userID]
 				err := conn.WriteMessage(websocket.CloseMessage, []byte{})
 				if err != nil {
