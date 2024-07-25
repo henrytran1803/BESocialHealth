@@ -13,5 +13,4 @@ RUN go mod download
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/main ./cmd/main.go
 
-# Set the entry point of the container to run the executable
 ENTRYPOINT ["/out/main"]
