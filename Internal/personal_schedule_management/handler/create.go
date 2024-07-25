@@ -39,6 +39,6 @@ func CreateScheduleDetailHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		if err := scheduleInteractor.CreateScheduleDetail(&scheduleDetail); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusCreated, gin.H{"schedule": scheduleDetail})
+		c.JSON(http.StatusOK, gin.H{"schedule": scheduleDetail})
 	}
 }
