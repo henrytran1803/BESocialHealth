@@ -1,7 +1,6 @@
 package accountmodels
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -25,7 +24,7 @@ type User struct {
 func (User) TableName() string { return "users" }
 
 type CreateUser struct {
-	gorm.Model
+	ID        int    `gorm:"primaryKey; column:id" json:"id"`
 	Email     string `gorm:"type:varchar(255);not null" json:"email"`
 	FirstName string `gorm:"type:varchar(255);column:firstname" json:"firstname"`
 	LastName  string `gorm:"type:varchar(255);column:lastname" json:"lastname"`
