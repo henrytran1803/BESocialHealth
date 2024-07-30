@@ -128,6 +128,7 @@ func main() {
 	content.GET("", personalcontenthandler.GetAllPostHandler(appctx))
 	content.GET("/coment/:id", personalcontenthandler.GetAllComentByPostIdHandler(appctx))
 	content.GET("/islike/user/:id/post/:postid", personalcontenthandler.CheckIsLikeByUserIdAndPosstIdHandler(appctx))
+	content.GET("/like/:id", personalcontenthandler.GetAllLikesByUserIddHandler(appctx))
 
 	// schedule
 	schedule := v1.Group("/schedule")

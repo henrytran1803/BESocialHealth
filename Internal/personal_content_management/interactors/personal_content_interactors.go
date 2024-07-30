@@ -94,3 +94,10 @@ func (i *PersonalContentInteractor) CreateCommentNonePhoto(comment *personalcont
 	}
 	return isTrue, nil
 }
+func (i *PersonalContentInteractor) GetAllLikeByUserId(userID string) ([]personalcontentmodels.LikeGetAll, error) {
+	likes, err := i.PersonalContentRepository.GetAllLikeByUserId(userID)
+	if err != nil {
+		return nil, err
+	}
+	return likes, nil
+}

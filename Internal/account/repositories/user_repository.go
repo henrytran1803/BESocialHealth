@@ -60,6 +60,7 @@ func (r *AccountRepository) CreateAccount(user *accountmodels.CreateAccount) err
 			Email:     user.Email,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
+			Status:    0,
 			Role:      1,
 		}
 		if err := tx.Table(accountmodels.User{}.TableName()).Create(&createUser).Error; err != nil {
@@ -68,7 +69,7 @@ func (r *AccountRepository) CreateAccount(user *accountmodels.CreateAccount) err
 
 		createAccount := accountmodels.Account{
 			UserId:   int(createUser.ID),
-			Password: string(hashedPassword), // Lưu mật khẩu đã mã hóa vào cơ sở dữ liệu
+			Password: string(hashedPassword),
 		}
 		if err := tx.Table(accountmodels.Account{}.TableName()).Create(&createAccount).Error; err != nil {
 			return err

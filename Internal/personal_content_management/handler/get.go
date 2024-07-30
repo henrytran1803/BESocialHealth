@@ -94,3 +94,18 @@ func CheckIsLikeByUserIdAndPosstIdHandler(appctx appctx.AppContext) gin.HandlerF
 
 	}
 }
+func GetAllLikesByUserIddHandler(appctx appctx.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		db := appctx.GetMainDBConnection()
+		repo := personalcontentrepositories.NewPersonalContentRepository(db)
+		postInteractor := personalcontentinteractors.NewPersonalContentInteractor(repo)
+
+		likes, err := postInteractor.GetAllLikeByUserId(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, likes)
+
+	}
+}

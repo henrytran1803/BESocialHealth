@@ -29,6 +29,7 @@ type CreateUser struct {
 	FirstName string `gorm:"type:varchar(255);column:firstname" json:"firstname"`
 	LastName  string `gorm:"type:varchar(255);column:lastname" json:"lastname"`
 	Role      int    `gorm:"type:int ;column:role" json:"role"`
+	Status    int    `gorm:"type:int ;column:status" json:"status"`
 }
 type CreateAccount struct {
 	Email     string `gorm:"type:varchar(255);not null;column:email" json:"email"`

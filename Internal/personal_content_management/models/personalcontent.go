@@ -86,3 +86,10 @@ type GetComment struct {
 	User   *usermodels.UserPhoto `json:"user"`
 	Photo  *Photo                `json:"photos"`
 }
+type LikeGetAll struct {
+	Id     int    `json:"id" gorm:"column:id"`
+	UserId int64  `json:"user_id" gorm:"column:user_id"`
+	PostId int64  `json:"post_id" gorm:"column:post_id"`
+	Title  string `json:"title" gorm:"column:title"`
+	Name   string `json:"name" gorm:"column:name"`
+}

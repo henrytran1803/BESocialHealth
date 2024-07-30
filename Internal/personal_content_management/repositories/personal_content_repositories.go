@@ -2,6 +2,7 @@ package personalcontentrepositories
 
 import (
 	personalcontentmodels "BESocialHealth/Internal/personal_content_management/models"
+	usermodels "BESocialHealth/Internal/user_management/models"
 	userrepositories "BESocialHealth/Internal/user_management/repositories"
 	"errors"
 	"gorm.io/gorm"
@@ -308,4 +309,40 @@ func (r *PersonalContentRepository) CheckIsLike(postID string, userID string) (b
 		return false, err
 	}
 	return count > 0, nil
+}
+func (r *PersonalContentRepository) GetAllLikeByUserId(userID string) ([]personalcontentmodels.LikeGetAll, error) {
+	var likesGetAll []personalcontentmodels.LikeGetAll
+	var likes []personalcontentmodels.Like
+
+	// Retrieve all likes by the user
+	if err := r.DB.Table(personalcontentmodels.Like{}.TableName()).Where("user_id = ?", userID).Find(&likes).Error; err != nil {
+		return nil, err
+	}
+
+	// Iterate through each like to get associated post and user details
+	for _, like := range likes {
+		var post personalcontentmodels.Post
+		var user usermodels.User
+
+		// Retrieve post details by post ID
+		if err := r.DB.Table("posts").Where("id = ?", like.PostId).First(&post).Error; err != nil {
+			return nil, err
+		}
+
+		// Retrieve user details by user ID
+		if err := r.DB.Table("users").Where("id = ?", like.UserId).First(&user).Error; err != nil {
+			return nil, err
+		}
+
+		// Append the retrieved details to the result slice
+		likesGetAll = append(likesGetAll, personalcontentmodels.LikeGetAll{
+			Id:     like.Id,
+			UserId: like.UserId,
+			PostId: like.PostId,
+			Title:  post.Title,
+			Name:   user.FirstName + " " + user.LastName,
+		})
+	}
+
+	return likesGetAll, nil
 }
