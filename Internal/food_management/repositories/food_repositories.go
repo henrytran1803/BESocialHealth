@@ -3,6 +3,7 @@ package foodrepositories
 import (
 	foodmodels "BESocialHealth/Internal/food_management/models"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -130,6 +131,14 @@ func (r *FoodRepository) UpdatePhotoBase(photo *foodmodels.PhotoBase) error {
 	return nil
 }
 func (r *FoodRepository) UpdateFood(food *foodmodels.FoodUpdate) error {
+	var count int64
+	err := r.DB.Table("meal_detail").Where("dish_id = ?", food.Id).Count(&count).Error
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("cannot update food because it is referenced in mealdetail")
+	}
 	if err := r.DB.Table(foodmodels.Food{}.TableName()).Save(food).Error; err != nil {
 		return err
 	}

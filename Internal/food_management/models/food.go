@@ -1,53 +1,5 @@
 package foodmodels
 
-// CREATE TABLE `dishes` (
-// `id` int NOT NULL AUTO_INCREMENT,
-// `name` varchar(255) NOT NULL,
-// `description` text,
-// `calorie` double,
-// `protein` double,
-// `fat` double,
-// `carb` double,
-// `sugar` double,
-// `serving` double,
-// `status` int,
-// `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-// `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-// `deleted_at` TIMESTAMP NULL DEFAULT NULL,
-// PRIMARY KEY (`id`)
-// );
-
-//CREATE TABLE `photo_type` (
-//`id` int NOT NULL AUTO_INCREMENT,
-//`name` varchar(255),
-//`status` int,
-//`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-//`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//`deleted_at` TIMESTAMP NULL DEFAULT NULL,
-//PRIMARY KEY (`id`)
-//);
-//CREATE TABLE `photos` (
-//`id` int NOT NULL AUTO_INCREMENT,
-//`photo_type` int,
-//`url` varchar(255),
-//`post_id` int,
-//`comment_id` int,
-//`exersice_id` int,
-//`dish_id` int,
-//`user_id` int,
-//`status` int,
-//`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-//`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//`deleted_at` TIMESTAMP NULL DEFAULT NULL,
-//PRIMARY KEY (`id`),
-//FOREIGN KEY (`photo_type`) REFERENCES `photo_type`(`id`),
-//FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
-//FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`),
-//FOREIGN KEY (`comment_id`) REFERENCES `comments`(`id`),
-//FOREIGN KEY (`dish_id`) REFERENCES `dishes`(`id`),
-//FOREIGN KEY (`exersice_id`) REFERENCES `exersices`(`id`)
-//);
-
 type Food struct {
 	Id          int     `json:"id" gorm:"column:id"`
 	Name        string  `json:"name" gorm:"column:name"`

@@ -23,7 +23,6 @@ func (r *UserRepository) GetUserById(id int) (*usermodels.UserPhoto, error) {
 		userPhoto.Photo = &photo
 	}
 
-	// Populate userPhoto fields from user
 	userPhoto.Id = user.Id
 	userPhoto.Email = user.Email
 	userPhoto.FirstName = user.FirstName

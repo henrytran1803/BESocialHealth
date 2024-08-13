@@ -57,6 +57,7 @@ func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Co
 		WHERE cp.conversation_id IN (
 			SELECT conversation_id FROM conversationparticipants WHERE user_id = ?
 		)
+		ORDER BY c.created_at DESC
 	`, userID).Rows()
 	if err != nil {
 		return nil, err

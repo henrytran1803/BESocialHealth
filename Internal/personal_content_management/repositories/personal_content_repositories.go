@@ -229,7 +229,7 @@ func (r *PersonalContentRepository) GetPostById(postId int) (personalcontentmode
 }
 func (r *PersonalContentRepository) GetAllPosts() ([]personalcontentmodels.GetPost, error) {
 	var posts []personalcontentmodels.Post
-	if err := r.DB.Table(personalcontentmodels.Post{}.TableName()).Order("created_at asc").Find(&posts).Error; err != nil {
+	if err := r.DB.Table(personalcontentmodels.Post{}.TableName()).Order("created_at desc").Find(&posts).Error; err != nil {
 		return nil, err
 	}
 

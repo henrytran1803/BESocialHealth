@@ -122,7 +122,12 @@ func (r *MealRepository) GetInformationCalories(userID string, date string) (*fl
 	if err := r.DB.Table("meal_detail").
 		Joins("JOIN dishes ON meal_detail.dish_id = dishes.id").
 		Where("meal_detail.meal_id IN (SELECT id FROM meals WHERE user_id = ? AND DATE(date) = DATE(?))", userID, date).
-		Select("COALESCE(SUM(dishes.protein * meal_detail.serving / dishes.serving), 0) AS TotalProtein, COALESCE(SUM(dishes.fat * meal_detail.serving  / dishes.serving), 0) AS TotalFat, COALESCE(SUM(dishes.carb * meal_detail.serving  / dishes.serving), 0) AS TotalCarb, COALESCE(SUM(dishes.sugar * meal_detail.serving  / dishes.serving), 0) AS TotalSugar").
+		Select(`
+        COALESCE(SUM((dishes.calorie * meal_detail.serving) / dishes.serving), 0) AS TotalCalorie,
+        COALESCE(SUM(dishes.protein * meal_detail.serving / dishes.serving), 0) AS TotalProtein,
+        COALESCE(SUM(dishes.fat * meal_detail.serving / dishes.serving), 0) AS TotalFat,
+        COALESCE(SUM(dishes.carb * meal_detail.serving / dishes.serving), 0) AS TotalCarb,
+        COALESCE(SUM(dishes.sugar * meal_detail.serving / dishes.serving), 0) AS TotalSugar`).
 		Scan(&nutrientTotals).Error; err != nil {
 		return nil, nil, nil, nil, err
 	}

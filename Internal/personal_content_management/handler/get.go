@@ -69,7 +69,6 @@ func GetAllComentByPostIdHandler(appctx appctx.AppContext) gin.HandlerFunc {
 		db := appctx.GetMainDBConnection()
 		repo := personalcontentrepositories.NewPersonalContentRepository(db)
 		postInteractor := personalcontentinteractors.NewPersonalContentInteractor(repo)
-
 		comments, err := postInteractor.GetAllComentByPostId(idconv)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

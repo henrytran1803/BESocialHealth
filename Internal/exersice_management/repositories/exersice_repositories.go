@@ -3,6 +3,7 @@ package exersicerepositories
 import (
 	exersicemodels "BESocialHealth/Internal/exersice_management/models"
 	foodmodels "BESocialHealth/Internal/food_management/models"
+	"fmt"
 )
 
 func (r *ExersiceRepository) GetListExersice() ([]exersicemodels.GetExersiceList, error) {
@@ -63,6 +64,15 @@ func (r *ExersiceRepository) FindExersiceById(id int) (exersicemodels.Exersice, 
 }
 func (r *ExersiceRepository) UpdateExersice(id int, exersice *exersicemodels.Exersice) error {
 	exersice.Id = id
+	var count int64
+	err := r.DB.Table("schedule_detail").Where("exersice_id = ?", exersice.Id).Count(&count).Error
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("cannot update food because it is referenced in mealdetail")
+	}
+
 	return r.DB.Table(exersicemodels.Exersice{}.TableName()).Updates(exersice).Error
 }
 
@@ -101,6 +111,15 @@ func (r *ExersiceRepository) DeletePhotoByExersice(exerciseId int) error {
 	return nil
 }
 func (r *ExersiceRepository) UpdateExersiceNonePhoto(exersice *exersicemodels.Exersice) error {
+	var count int64
+	err := r.DB.Table("schedule_detail").Where("exersice_id = ?", exersice.Id).Count(&count).Error
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("cannot update food because it is referenced in mealdetail")
+	}
+
 	if err := r.DB.Table(exersicemodels.Exersice{}.TableName()).Save(exersice).Error; err != nil {
 		return err
 	}

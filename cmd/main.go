@@ -56,7 +56,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "Message broadcasted"})
 	})
 	// Reminder Checker
-	reminderChecker := ws.NewReminderChecker(appctx, manager, 1*time.Minute) // Kiểm tra mỗi phút một lần
+	reminderChecker := ws.NewReminderChecker(appctx, manager, 1*time.Minute)
 	reminderChecker.Start()
 
 	// account
@@ -77,7 +77,7 @@ func main() {
 	food.DELETE("/:id", foodhandler.DeleteFoodHandler(appctx))
 	food.GET("", foodhandler.GetListFoodHandler(appctx))
 	food.GET("/:id", foodhandler.GetFoodHandler(appctx))
-	food.DELETE("photo/:id", foodhandler.DeletePhotoHandler(appctx))
+	food.DELETE("/photo/:id", foodhandler.DeletePhotoHandler(appctx))
 	food.POST("photo", foodhandler.CreatePhotoHandler(appctx))
 	food.POST("photos", foodhandler.CreatePhotoListHandler(appctx))
 	//exersice
@@ -88,7 +88,7 @@ func main() {
 	exersice.DELETE("/:id", exersicehandler.DeleteExersiceHandler(appctx))
 	exersice.GET("", exersicehandler.GetistExersiceHandler(appctx))
 	exersice.GET("/:id", exersicehandler.GetExersiceByIdHandler(appctx))
-	exersice.PUT("", exersicehandler.UpdateExersiceNonePhotoById(appctx))
+	exersice.PUT("/photo", exersicehandler.UpdateExersiceNonePhotoById(appctx))
 	exersice.GET("/type", exersicehandler.GetAllExTypeHandler(appctx))
 	//user
 	user := v1.Group("/user")
@@ -167,3 +167,8 @@ func main() {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
+
+//tranvietanh1803@gmail.com
+//Anh_18032002
+//admin@gmail.com
+//n20dccn087@student.ptithcm.edu.vn

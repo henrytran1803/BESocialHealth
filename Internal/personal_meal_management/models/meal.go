@@ -51,6 +51,7 @@ func (GetDish) TableName() string {
 }
 
 type MealNutrientTotals struct {
+	TotalCalorie float64 `json:"total_calorie"`
 	TotalProtein float64 `json:"total_protein"`
 	TotalFat     float64 `json:"total_fat"`
 	TotalCarb    float64 `json:"total_carb"`

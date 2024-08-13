@@ -94,9 +94,9 @@ func (i *FoodInteractor) DeletePhotoById(id int) error {
 	if err != nil {
 		return err
 	}
-	if err := i.FoodRepository.DeletePhotoByFood(strconv.Itoa(id)); err != nil {
-		return err
-	}
+	//if err := i.FoodRepository.DeletePhotoByFood(strconv.Itoa(id)); err != nil {
+	//	return err
+	//}
 	return nil
 }
 func (i *FoodInteractor) CreatePhoto(photo *foodmodels.PhotoBase) error {
