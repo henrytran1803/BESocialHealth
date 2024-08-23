@@ -36,7 +36,7 @@ type Schedule struct {
 	Id       int        `json:"id" gorm:"column:id"`
 	User_id  int64      `json:"user_id" gorm:"column:user_id;"`
 	Time     *time.Time `json:"time" gorm:"column:time;"`
-	Calories float32    `json:"calories" gorm:"column:calories;"`
+	Calories float32    `json:"calories" gorm:"column:calories_burn;"`
 }
 type ScheduleDetail struct {
 	Id          int `json:"id" gorm:"column:id"`

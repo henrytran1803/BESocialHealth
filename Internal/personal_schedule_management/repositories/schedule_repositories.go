@@ -197,10 +197,11 @@ func (r *ScheduleRepository) GetListScheduleByUserId(userId string) ([]schedulem
 			return nil, err
 		}
 		result := schedulemodels.ScheduleGet{
-			User_id: schedule.User_id,
-			Time:    schedule.Time,
-			Id:      schedule.Id,
-			Detail:  details,
+			User_id:  schedule.User_id,
+			Time:     schedule.Time,
+			Id:       schedule.Id,
+			Calories: schedule.Calories,
+			Detail:   details,
 		}
 		results = append(results, result)
 	}

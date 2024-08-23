@@ -50,15 +50,21 @@ func (r *MessageRepository) GetConversationMessages(conversationID int) (*messag
 func (r *MessageRepository) GetUserConversations(userID int) ([]messagemodels.Conversation, error) {
 	var conversations []messagemodels.Conversation
 
-	rows, err := r.DB.Raw(`
-		SELECT c.conversation_id, c.created_at, cp.user_id
-		FROM conversations c
-		JOIN conversationparticipants cp ON c.conversation_id = cp.conversation_id
-		WHERE cp.conversation_id IN (
-			SELECT conversation_id FROM conversationparticipants WHERE user_id = ?
-		)
-		ORDER BY c.created_at DESC
-	`, userID).Rows()
+	rows, err := r.DB.Raw(`SELECT c.conversation_id, 
+       COALESCE(m.last_message_time, c.created_at) as created_at, 
+       cp.user_id
+FROM conversations c
+JOIN conversationparticipants cp ON c.conversation_id = cp.conversation_id
+LEFT JOIN (
+    SELECT conversation_id, MAX(timestamp) as last_message_time
+    FROM messages
+    GROUP BY conversation_id
+) m ON c.conversation_id = m.conversation_id
+WHERE cp.conversation_id IN (
+    SELECT conversation_id FROM conversationparticipants WHERE user_id = ?
+)
+ORDER BY created_at DESC;
+`, userID).Rows()
 	if err != nil {
 		return nil, err
 	}
